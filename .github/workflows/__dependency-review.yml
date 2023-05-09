@@ -1,0 +1,59 @@
+---
+name: Dependency Review
+
+on:
+  workflow_call:
+    inputs:
+      runs-on:
+        description: The type of runner to use
+        required: false
+        type: string
+        default: ubuntu-latest
+
+concurrency:
+  group: ${{ format('{0}-{1}-{2}-{3}-{4}', github.workflow, github.event_name, github.ref, github.base_ref, github.head_ref) }}
+  cancel-in-progress: true
+
+env:
+  DEBUG: ${{ secrets.ACTIONS_RUNNER_DEBUG || vars.ACTIONS_RUNNER_DEBUG || secrets.ACTIONS_STEP_DEBUG || vars.ACTIONS_STEP_DEBUG || false }}
+
+jobs:
+  dependency-review:
+    name: Dependency Review
+    if: ${{ github.repository_visibility == 'public' && (github.event_name == 'pull_request' && !github.event.pull_request.draft && !contains(fromJSON('["closed", "converted_to_draft"]'), github.event.action)) }}
+    runs-on: ${{ inputs.runs-on }}
+    # permissions:
+    #   contents: read
+    #   pull-requests: write
+    steps:
+      - name: Debug
+        if: ${{ env.DEBUG == 'true' }}
+        uses: raven-actions/debug@v1
+        with:
+          vars-context: ${{ toJson(vars) }}
+          secrets-context: ${{ toJson(secrets) }}
+          needs-context: ${{ toJson(needs) }}
+          inputs-context: ${{ toJson(inputs) }}
+
+      - name: Get GitHub App Token
+        uses: wow-actions/use-app-token@v2
+        id: get-token
+        with:
+          app_id: ${{ secrets.ORG_BOT_APP_ID }}
+          private_key: ${{ secrets.ORG_BOT_PRIVATE_KEY }}
+          fallback: ${{ github.token }}
+
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          token: ${{ steps.get-token.outputs.BOT_TOKEN }}
+
+      - name: Dependency Review
+        uses: actions/dependency-review-action@v3
+        with:
+          repo-token: ${{ steps.get-token.outputs.BOT_TOKEN }}
+          # config-file: raven-actions/.workflows/.github/dependency-review-config.yml@main
+          # external-repo-token: ${{ steps.get-token.outputs.BOT_TOKEN }}
+          vulnerability-check: true
+          license-check: true
+          comment-summary-in-pr: true
