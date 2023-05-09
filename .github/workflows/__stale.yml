@@ -46,14 +46,17 @@ jobs:
         uses: actions/stale@v8
         id: stale
         with:
+          # general
           repo-token: ${{ steps.get-token.outputs.BOT_TOKEN }}
           days-before-stale: ${{ env.DAYS_BEFORE_STALE }}
           days-before-close: ${{ env.DAYS_BEFORE_CLOSE }}
+          # issues
           exempt-issue-labels: bug,security
           stale-issue-label: stale
           stale-issue-message: "This issue is stale because it has been open ${{ env.DAYS_BEFORE_STALE }} days with no activity. Remove stale label or comment or this will be closed in ${{ env.DAYS_BEFORE_CLOSE }} days."
           close-issue-label: wontfix
           close-issue-message: "This issue was closed because it has been stalled for ${{ env.DAYS_BEFORE_CLOSE }} days with no activity."
+          # prs
           exempt-pr-labels: security
           stale-pr-label: stale
           stale-pr-message: "This PR is stale because it has been open ${{ env.DAYS_BEFORE_STALE }} days with no activity. Remove stale label or comment or this will be closed in ${{ env.DAYS_BEFORE_CLOSE }} days."
