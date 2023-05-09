@@ -18,6 +18,10 @@ on:
         description: List of all staled issues and pull requests
         value: ${{ jobs.stale.outputs.staled-issues-prs }}
 
+concurrency:
+  group: ${{ format('{0}-{1}-{2}-{3}-{4}', github.workflow, github.event_name, github.ref, github.base_ref, github.head_ref) }}
+  cancel-in-progress: true
+
 env:
   DEBUG: ${{ secrets.ACTIONS_RUNNER_DEBUG || vars.ACTIONS_RUNNER_DEBUG || secrets.ACTIONS_STEP_DEBUG || vars.ACTIONS_STEP_DEBUG || false }}
   DAYS_BEFORE_STALE: 30
