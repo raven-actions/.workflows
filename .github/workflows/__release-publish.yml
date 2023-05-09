@@ -35,7 +35,7 @@ on:
 
 jobs:
   gh-release:
-    name: GitHub Release
+    name: Publish Release
     outputs:
       id: ${{ steps.gh-release.outputs.id }}
       url: ${{ steps.gh-release.outputs.url }}
