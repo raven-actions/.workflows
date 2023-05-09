@@ -8,4 +8,6 @@ updates:
     schedule:
       interval: daily
     commit-message:
-      prefix: "[github-actions] ⬆️ "
+      prefix: "⬆️ github-actions"
+      # prefix-development: "⬆️ chore"
+      include: "scope"

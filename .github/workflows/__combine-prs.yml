@@ -29,6 +29,11 @@ on:
         required: false
         type: string
         default: combined-dependabot-prs
+      pr-title:
+        description: The title of the pull request to create
+        required: false
+        type: string
+        default: "⬆️ chore(dependabot): update dependencies"
 
     outputs:
       pr-url:
@@ -83,3 +88,4 @@ jobs:
           ci_required: ${{ inputs.ci-required }}
           review_required: ${{ inputs.review-required }}
           combine_branch_name: ${{ inputs.combine-branch-name }}
+          pr_title: ${{ inputs.pr-title }}
