@@ -4,16 +4,17 @@ name: Draft Release
 on:
   workflow_call:
     inputs:
-      runs-on:
-        description: The type of runner to use
-        required: false
-        type: string
-        default: ubuntu-latest
       prerelease:
         description: Whether to create a pre-release or not
         required: false
         type: boolean
         default: true
+      runs-on:
+        description: The type of runner to use
+        required: false
+        type: string
+        default: ubuntu-latest
+
     outputs:
       id:
         description: The ID of the release that was created or updated
