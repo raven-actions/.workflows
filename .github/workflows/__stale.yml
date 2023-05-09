@@ -1,0 +1,45 @@
+---
+name: Stale
+
+on:
+  workflow_call:
+    inputs:
+      runs-on:
+        description: The type of runner to use
+        required: false
+        type: string
+        default: ubuntu-latest
+
+    outputs:
+      closed-issues-prs:
+        description: List of all closed issues and pull requests
+        value: ${{ jobs.stale.outputs.closed-issues-prs }}
+      staled-issues-prs:
+        description: List of all staled issues and pull requests
+        value: ${{ jobs.stale.outputs.staled-issues-prs }}
+
+jobs:
+  stale:
+    name: Close stale issues and PRs
+    outputs:
+      closed-issues-prs: ${{ steps.stale.outputs.id }}
+      staled-issues-prs: ${{ steps.stale.outputs.name }}
+    # permissions:
+    #   contents: write # only for delete-branch option
+    #   issues: write
+    #   pull-requests: write
+    runs-on: ${{ inputs.runs-on }}
+    steps:
+      - name: Get GitHub App Token
+        uses: wow-actions/use-app-token@v2
+        id: get-token
+        with:
+          app_id: ${{ secrets.ORG_BOT_APP_ID }}
+          private_key: ${{ secrets.ORG_BOT_PRIVATE_KEY }}
+          fallback: ${{ github.token }}
+
+      - name: Run Stale
+        uses: actions/stale@v8
+        id: stale
+        with:
+          repo-token: ${{ steps.get-token.outputs.BOT_TOKEN }}
