@@ -14,9 +14,9 @@ jobs:
   draft-release:
     if: ${{ github.repository_owner == 'raven-actions' }}
     name: Draft Release
-    permissions:
-      contents: write
-      pull-requests: read
+    # permissions:
+    #   contents: write
+    #   pull-requests: read
     runs-on: ${{ inputs.runs-on }}
     steps:
       - name: Get GitHub App Token
