@@ -19,6 +19,7 @@ on:
         value: ${{ jobs.stale.outputs.staled-issues-prs }}
 
 env:
+  DEBUG: ${{ secrets.ACTIONS_RUNNER_DEBUG || vars.ACTIONS_RUNNER_DEBUG || secrets.ACTIONS_STEP_DEBUG || vars.ACTIONS_STEP_DEBUG || false }}
   DAYS_BEFORE_STALE: 30
   DAYS_BEFORE_CLOSE: 7
 
@@ -34,6 +35,15 @@ jobs:
     #   pull-requests: write
     runs-on: ${{ inputs.runs-on }}
     steps:
+      - name: Debug
+        if: ${{ env.DEBUG == 'true' }}
+        uses: raven-actions/debug@v1
+        with:
+          vars-context: ${{ toJson(vars) }}
+          secrets-context: ${{ toJson(secrets) }}
+          needs-context: ${{ toJson(needs) }}
+          inputs-context: ${{ toJson(inputs) }}
+
       - name: Get GitHub App Token
         uses: wow-actions/use-app-token@v2
         id: get-token

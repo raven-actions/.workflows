@@ -32,6 +32,9 @@ on:
         description: The URL for uploading assets to the release
         value: ${{ jobs.draft-release.outputs.upload_url }}
 
+env:
+  DEBUG: ${{ secrets.ACTIONS_RUNNER_DEBUG || vars.ACTIONS_RUNNER_DEBUG || secrets.ACTIONS_STEP_DEBUG || vars.ACTIONS_STEP_DEBUG || false }}
+
 jobs:
   draft-release:
     name: Draft Release
@@ -46,6 +49,15 @@ jobs:
     #   pull-requests: read
     runs-on: ${{ inputs.runs-on }}
     steps:
+      - name: Debug
+        if: ${{ env.DEBUG == 'true' }}
+        uses: raven-actions/debug@v1
+        with:
+          vars-context: ${{ toJson(vars) }}
+          secrets-context: ${{ toJson(secrets) }}
+          needs-context: ${{ toJson(needs) }}
+          inputs-context: ${{ toJson(inputs) }}
+
       - name: Get GitHub App Token
         uses: wow-actions/use-app-token@v2
         id: get-token

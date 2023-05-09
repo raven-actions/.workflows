@@ -9,17 +9,13 @@ on:
         required: false
         type: string
         default: ubuntu-latest
-      debug:
-        description: Debug mode
-        required: false
-        type: boolean
 
 concurrency:
   group: ${{ format('{0}-{1}-{2}-{3}-{4}', github.workflow, github.event_name, github.ref, github.base_ref, github.head_ref) }}
   cancel-in-progress: true
 
 env:
-  DEBUG: ${{ inputs.debug || secrets.ACTIONS_RUNNER_DEBUG || vars.ACTIONS_RUNNER_DEBUG || secrets.ACTIONS_STEP_DEBUG || vars.ACTIONS_STEP_DEBUG || false }}
+  DEBUG: ${{ secrets.ACTIONS_RUNNER_DEBUG || vars.ACTIONS_RUNNER_DEBUG || secrets.ACTIONS_STEP_DEBUG || vars.ACTIONS_STEP_DEBUG || false }}
 
 jobs:
   Lint:
@@ -30,6 +26,15 @@ jobs:
     #   contents: read
     #   pull-requests: read
     steps:
+      - name: Debug
+        if: ${{ env.DEBUG == 'true' }}
+        uses: raven-actions/debug@v1
+        with:
+          vars-context: ${{ toJson(vars) }}
+          secrets-context: ${{ toJson(secrets) }}
+          needs-context: ${{ toJson(needs) }}
+          inputs-context: ${{ toJson(inputs) }}
+
       - name: Get GitHub App Token
         uses: wow-actions/use-app-token@v2
         id: get-token
