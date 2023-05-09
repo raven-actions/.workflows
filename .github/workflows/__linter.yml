@@ -1,5 +1,5 @@
 ---
-name: Lint
+name: Linter
 
 on:
   workflow_call:
@@ -18,8 +18,8 @@ env:
   DEBUG: ${{ secrets.ACTIONS_RUNNER_DEBUG || vars.ACTIONS_RUNNER_DEBUG || secrets.ACTIONS_STEP_DEBUG || vars.ACTIONS_STEP_DEBUG || false }}
 
 jobs:
-  lint-validate:
-    name: Lint and Validate
+  linter:
+    name: Linter
     if: ${{ github.event_name == 'push' || (github.event_name == 'pull_request' && !github.event.pull_request.draft && !contains(fromJSON('["closed", "converted_to_draft"]'), github.event.action)) }}
     runs-on: ${{ inputs.runs-on }}
     # permissions:
