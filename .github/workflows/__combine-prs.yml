@@ -102,7 +102,7 @@ jobs:
       #   env:
       #     GITHUB_TOKEN: ${{ steps.get-token.outputs.BOT_TOKEN }}
 
-      - name: Enable auto-merge for Dependabot PRs
+      - name: Auto-merge dependabot PRs
         if: ${{ inputs.branch-prefix == 'dependabot' }}
         run: gh pr merge --auto --delete-branch --squash "${{ steps.combine-prs.outputs.pr_url }}"
         env:
