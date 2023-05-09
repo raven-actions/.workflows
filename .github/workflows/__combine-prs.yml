@@ -34,6 +34,11 @@ on:
         required: false
         type: string
         default: "⬆️ chore(deps): update"
+      labels:
+        description: A comma-separated list of labels to add to the combined PR
+        required: false
+        type: string
+        default: dependencies
 
     outputs:
       pr-url:
@@ -89,6 +94,7 @@ jobs:
           review_required: ${{ inputs.review-required }}
           combine_branch_name: ${{ inputs.combine-branch-name }}
           pr_title: ${{ inputs.pr-title }}
+          labels: ${{ inputs.labels }}
 
       # - name: Approve a PR
       #   if: ${{ inputs.branch-prefix == 'dependabot' }}
