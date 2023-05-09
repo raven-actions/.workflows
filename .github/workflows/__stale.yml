@@ -18,6 +18,10 @@ on:
         description: List of all staled issues and pull requests
         value: ${{ jobs.stale.outputs.staled-issues-prs }}
 
+env:
+  DAYS_BEFORE_STALE: 30
+  DAYS_BEFORE_CLOSE: 7
+
 jobs:
   stale:
     name: Close stale issues and PRs
@@ -43,3 +47,15 @@ jobs:
         id: stale
         with:
           repo-token: ${{ steps.get-token.outputs.BOT_TOKEN }}
+          days-before-stale: ${{ env.DAYS_BEFORE_STALE }}
+          days-before-close: ${{ env.DAYS_BEFORE_CLOSE }}
+          exempt-issue-labels: bug,security
+          stale-issue-label: stale
+          stale-issue-message: "This issue is stale because it has been open ${{ env.DAYS_BEFORE_STALE }} days with no activity. Remove stale label or comment or this will be closed in ${{ env.DAYS_BEFORE_CLOSE }} days."
+          close-issue-label: wontfix
+          close-issue-message: "This issue was closed because it has been stalled for ${{ env.DAYS_BEFORE_CLOSE }} days with no activity."
+          exempt-pr-labels: security
+          stale-pr-label: stale
+          stale-pr-message: "This PR is stale because it has been open ${{ env.DAYS_BEFORE_STALE }} days with no activity. Remove stale label or comment or this will be closed in ${{ env.DAYS_BEFORE_CLOSE }} days."
+          close-pr-label: wontfix
+          close-pr-message: "This PR was closed because it has been stalled for ${{ env.DAYS_BEFORE_CLOSE }} days with no activity."
