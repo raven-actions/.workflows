@@ -90,11 +90,11 @@ jobs:
           combine_branch_name: ${{ inputs.combine-branch-name }}
           pr_title: ${{ inputs.pr-title }}
 
-      - name: Approve a PR
-        if: ${{ inputs.branch-prefix == 'dependabot' }}
-        run: gh pr review --approve "${{ steps.combine-prs.outputs.pr_url }}"
-        env:
-          GITHUB_TOKEN: ${{ github.action }}
+      # - name: Approve a PR
+      #   if: ${{ inputs.branch-prefix == 'dependabot' }}
+      #   run: gh pr review --approve "${{ steps.combine-prs.outputs.pr_url }}"
+      #   env:
+      #     GITHUB_TOKEN: ${{ steps.get-token.outputs.BOT_TOKEN }}
 
       - name: Enable auto-merge for Dependabot PRs
         if: ${{ inputs.branch-prefix == 'dependabot' }}
