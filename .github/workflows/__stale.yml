@@ -24,7 +24,7 @@ env:
 
 jobs:
   stale:
-    name: Close stale issues and PRs
+    name: Close or stale Issues and PRs
     outputs:
       closed-issues-prs: ${{ steps.stale.outputs.id }}
       staled-issues-prs: ${{ steps.stale.outputs.name }}
@@ -42,7 +42,7 @@ jobs:
           private_key: ${{ secrets.ORG_BOT_PRIVATE_KEY }}
           fallback: ${{ github.token }}
 
-      - name: Run Stale
+      - name: Stale
         uses: actions/stale@v8
         id: stale
         with:
