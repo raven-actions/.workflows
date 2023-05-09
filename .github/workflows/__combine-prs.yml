@@ -94,7 +94,7 @@ jobs:
         if: ${{ inputs.branch-prefix == 'dependabot' }}
         run: gh pr review --approve "${{ steps.combine-prs.outputs.pr_url }}"
         env:
-          GITHUB_TOKEN: ${{ steps.get-token.outputs.BOT_TOKEN }}
+          GITHUB_TOKEN: ${{ github.action }}
 
       - name: Enable auto-merge for Dependabot PRs
         if: ${{ inputs.branch-prefix == 'dependabot' }}
