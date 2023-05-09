@@ -33,7 +33,7 @@ on:
         description: The title of the pull request to create
         required: false
         type: string
-        default: "⬆️ chore(dependabot): update dependencies"
+        default: "⬆️ chore(deps): update"
 
     outputs:
       pr-url:
@@ -57,9 +57,9 @@ jobs:
       pr-url: ${{ steps.combine-prs.outputs.pr_url }}
       pr-number: ${{ steps.combine-prs.outputs.pr_number }}
     # permissions:
-    #   contents: write
-    #   pull-requests: write
-    #   checks: read
+    #   contents: write  # to create a new branch and merge other branches together
+    #   pull-requests: write  # to create a new PR with the combined changes
+    #   checks: read  # to check if CI is passing or not before combining PRs
     runs-on: ${{ inputs.runs-on }}
     steps:
       - name: Debug
@@ -89,3 +89,15 @@ jobs:
           review_required: ${{ inputs.review-required }}
           combine_branch_name: ${{ inputs.combine-branch-name }}
           pr_title: ${{ inputs.pr-title }}
+
+      - name: Approve a PR
+        if: ${{ inputs.branch-prefix == 'dependabot' }}
+        run: gh pr review --approve "${{ steps.combine-prs.outputs.pr_url }}"
+        env:
+          GITHUB_TOKEN: ${{ steps.get-token.outputs.BOT_TOKEN }}
+
+      - name: Enable auto-merge for Dependabot PRs
+        if: ${{ inputs.branch-prefix == 'dependabot' }}
+        run: gh pr merge --auto --squash "${{ steps.combine-prs.outputs.pr_url }}"
+        env:
+          GITHUB_TOKEN: ${{ steps.get-token.outputs.BOT_TOKEN }}
