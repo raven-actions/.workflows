@@ -1,0 +1,85 @@
+---
+name: Combine PRs
+
+on:
+  workflow_call:
+    inputs:
+      runs-on:
+        description: The type of runner to use
+        required: false
+        type: string
+        default: ubuntu-latest
+      branch-prefix:
+        description: The prefix of the branches to combine
+        required: false
+        type: string
+        default: dependabot
+      ci-required:
+        description: Whether or not CI should be passing to combine the PR
+        required: false
+        type: boolean
+        default: true
+      review-required:
+        description: Whether or not a review should be required to combine the PR
+        required: false
+        type: boolean
+        default: false
+      combine-branch-name:
+        description: The name of the branch to combine the PRs into
+        required: false
+        type: string
+        default: combined-dependabot-prs
+
+    outputs:
+      pr-url:
+        description: The pull request URL if a PR was created
+        value: ${{ jobs.combine-prs.outputs.pr-url }}
+      pr-number:
+        description: The pull request number if a PR was created
+        value: ${{ jobs.combine-prs.outputs.pr-number }}
+
+concurrency:
+  group: ${{ format('{0}-{1}-{2}-{3}-{4}', github.workflow, github.event_name, github.ref, github.base_ref, github.head_ref) }}
+  cancel-in-progress: true
+
+env:
+  DEBUG: ${{ secrets.ACTIONS_RUNNER_DEBUG || vars.ACTIONS_RUNNER_DEBUG || secrets.ACTIONS_STEP_DEBUG || vars.ACTIONS_STEP_DEBUG || false }}
+
+jobs:
+  combine-prs:
+    name: Combine PRs
+    outputs:
+      pr-url: ${{ steps.combine-prs.outputs.pr_url }}
+      pr-number: ${{ steps.combine-prs.outputs.pr_number }}
+    # permissions:
+    #   contents: write
+    #   pull-requests: write
+    #   checks: read
+    runs-on: ${{ inputs.runs-on }}
+    steps:
+      - name: Debug
+        if: ${{ env.DEBUG == 'true' }}
+        uses: raven-actions/debug@v1
+        with:
+          vars-context: ${{ toJson(vars) }}
+          secrets-context: ${{ toJson(secrets) }}
+          needs-context: ${{ toJson(needs) }}
+          inputs-context: ${{ toJson(inputs) }}
+
+      - name: Get GitHub App Token
+        uses: wow-actions/use-app-token@v2
+        id: get-token
+        with:
+          app_id: ${{ secrets.ORG_BOT_APP_ID }}
+          private_key: ${{ secrets.ORG_BOT_PRIVATE_KEY }}
+          fallback: ${{ github.token }}
+
+      - name: Combine PRs
+        id: combine-prs
+        uses: github/combine-prs@v3.1.1
+        with:
+          github_token: ${{ steps.get-token.outputs.BOT_TOKEN }}
+          branch_prefix: ${{ inputs.branch-prefix }}
+          ci_required: ${{ inputs.ci-required }}
+          review_required: ${{ inputs.review-required }}
+          combine_branch_name: ${{ inputs.combine-branch-name }}
