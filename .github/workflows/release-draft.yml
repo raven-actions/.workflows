@@ -1,0 +1,54 @@
+---
+name: Draft Release
+
+on:
+  workflow_call:
+    inputs:
+      runs-on:
+        description: The type of runner to use
+        required: false
+        type: string
+        default: ubuntu-latest
+
+jobs:
+  draft-release:
+    if: ${{ github.repository_owner == 'raven-actions' }}
+    name: Draft Release
+    permissions:
+      contents: write
+      pull-requests: read
+    runs-on: ${{ inputs.runs-on }}
+    steps:
+      - name: Get GitHub App Token
+        uses: wow-actions/use-app-token@v2
+        id: get-token
+        with:
+          app_id: ${{ secrets.ORG_BOT_APP_ID }}
+          private_key: ${{ secrets.ORG_BOT_PRIVATE_KEY }}
+          fallback: ${{ github.token }}
+
+      - name: Run Release Drafter
+        uses: release-drafter/release-drafter@v5
+        id: release-drafter
+        with:
+          prerelease: true
+        env:
+          GITHUB_TOKEN: ${{ steps.get-token.outputs.BOT_TOKEN }}
+
+      - name: Set Release URL in the Summary
+        if: ${{ runner.os != 'Windows' }}
+        run: |
+          echo "${RELEASE_URL}"
+          echo "${RELEASE_URL}" >> $GITHUB_STEP_SUMMARY
+        shell: bash
+        env:
+          RELEASE_URL: ${{ steps.release-drafter.outputs.html_url }}
+
+      - name: Set Release URL in the Summary
+        if: ${{ runner.os == 'Windows' }}
+        run: |
+          Write-Output "${env:RELEASE_URL}"
+          Write-Output "${env:RELEASE_URL}" >> ${env:GITHUB_STEP_SUMMARY}
+        shell: pwsh
+        env:
+          RELEASE_URL: ${{ steps.release-drafter.outputs.html_url }}
