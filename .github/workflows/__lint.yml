@@ -1,0 +1,56 @@
+---
+name: Lint
+
+on:
+  workflow_call:
+    inputs:
+      runs-on:
+        description: The type of runner to use
+        required: false
+        type: string
+        default: ubuntu-latest
+      debug:
+        description: Debug mode
+        required: false
+        type: boolean
+
+concurrency:
+  group: ${{ format('{0}-{1}-{2}-{3}-{4}', github.workflow, github.event_name, github.ref, github.base_ref, github.head_ref) }}
+  cancel-in-progress: true
+
+env:
+  DEBUG: ${{ inputs.debug || secrets.ACTIONS_RUNNER_DEBUG || vars.ACTIONS_RUNNER_DEBUG || secrets.ACTIONS_STEP_DEBUG || vars.ACTIONS_STEP_DEBUG || false }}
+
+jobs:
+  Lint:
+    name: Lint and Validate
+    if: ${{ github.event_name == 'push' || (github.event_name == 'pull_request' && !github.event.pull_request.draft) }}
+    runs-on: ${{ inputs.runs-on }}
+    permissions:
+      contents: read
+      pull-requests: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Detect changes
+        uses: dorny/paths-filter@v2
+        id: changes
+        with:
+          filters: |
+            gh-workflows:
+              - '.github/workflows/**'
+            md:
+              - '**/*.md'
+
+      - name: actionlint
+        if: ${{ steps.changes.outputs.gh-workflows == 'true' }}
+        uses: raven-actions/actionlint@v1
+        with:
+          flags: "-ignore SC2086"
+
+      - name: Markdown Links
+        if: ${{ steps.changes.outputs.md == 'true' }}
+        uses: gaurav-nelson/github-action-markdown-link-check@v1
+        with:
+          config-file: .github/linters/.markdown-link-check.json
