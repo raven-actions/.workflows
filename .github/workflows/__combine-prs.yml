@@ -39,6 +39,11 @@ on:
         required: false
         type: string
         default: dependencies
+      ignore-label:
+        description: The label to ignore when combining PRs
+        required: false
+        type: string
+        default: no-combine
 
     outputs:
       pr-url:
@@ -95,6 +100,7 @@ jobs:
           combine_branch_name: ${{ inputs.combine-branch-name }}
           pr_title: ${{ inputs.pr-title }}
           labels: ${{ inputs.labels }}
+          ignore_label: ${{ inputs.ignore-label }}
 
       # - name: Approve a PR
       #   if: ${{ inputs.branch-prefix == 'dependabot' }}
@@ -102,7 +108,7 @@ jobs:
       #   env:
       #     GITHUB_TOKEN: ${{ steps.get-token.outputs.BOT_TOKEN }}
 
-      - name: Auto-merge dependabot PRs
+      - name: Auto-merge PRs
         if: ${{ inputs.branch-prefix == 'dependabot' }}
         run: gh pr merge --auto --delete-branch --squash "${{ steps.combine-prs.outputs.pr_url }}"
         env:
