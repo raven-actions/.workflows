@@ -1,0 +1,127 @@
+# For most projects, this workflow file will not need changing; you simply need
+# to commit it to your repository.
+#
+# You may wish to alter this file to override the set of languages analyzed,
+# or to provide custom queries or build logic.
+#
+# ******** NOTE ********
+# We have attempted to detect the languages in your repository. Please check
+# the `language` matrix defined below to confirm you have the correct set of
+# supported CodeQL languages.
+#
+---
+name: CodeQL Analyze
+
+on:
+  workflow_call:
+    inputs:
+      languages:
+        description: "Optional input to set languages for CodeQL check. Supported values are: 'cpp', 'csharp', 'go', 'java', 'javascript', 'typescript', 'python', 'ruby'. To set multiple languages, use the same syntax as you can see in the default value."
+        required: false
+        type: string
+        default: "['TypeScript']"
+      config-file:
+        description: Optional input to set path to a CodeQL config file
+        required: true
+        type: string
+      build-command:
+        description: Optional input to specify manual build command. The multiline syntax is supported
+        required: false
+        type: string
+      runs-on:
+        required: false
+        type: string
+
+env:
+  DEBUG: ${{ secrets.ACTIONS_RUNNER_DEBUG || vars.ACTIONS_RUNNER_DEBUG || secrets.ACTIONS_STEP_DEBUG || vars.ACTIONS_STEP_DEBUG || false }}
+
+jobs:
+  analyze:
+    if: ${{ github.repository_visibility == 'public' }}
+    name: Analyze
+    runs-on: ${{ inputs.runs-on }}
+    # permissions:
+    #   contents: read
+    #   actions: read
+    #   security-events: write
+    strategy:
+      fail-fast: false
+      matrix:
+        language: ${{fromJson(inputs.languages)}}
+    steps:
+      - name: Debug
+        if: ${{ env.DEBUG == 'true' }}
+        uses: raven-actions/debug@v1
+        with:
+          vars-context: ${{ toJson(vars) }}
+          secrets-context: ${{ toJson(secrets) }}
+          needs-context: ${{ toJson(needs) }}
+          inputs-context: ${{ toJson(inputs) }}
+
+      - name: Get GitHub App Token
+        uses: wow-actions/use-app-token@v2
+        id: get-token
+        with:
+          app_id: ${{ secrets.ORG_BOT_APP_ID }}
+          private_key: ${{ secrets.ORG_BOT_PRIVATE_KEY }}
+          fallback: ${{ github.token }}
+
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          token: ${{ steps.get-token.outputs.BOT_TOKEN }}
+
+      # Initializes the CodeQL tools for scanning.
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v2
+        with:
+          config-file: ${{ inputs.config-file }}
+          languages: ${{ matrix.language }}
+          source-root: src
+          token: ${{ steps.get-token.outputs.BOT_TOKEN }}
+          # If you wish to specify custom queries, you can do so here or in a config file.
+          # By default, queries listed here will override any specified in a config file.
+          # Prefix the list here with "+" to use these queries and those in the config file.
+
+          # Details on CodeQL's query packs refer to : https://docs.github.com/en/code-security/code-scanning/automatically-scanning-your-code-for-vulnerabilities-and-errors/configuring-code-scanning#using-queries-in-ql-packs
+          # queries: security-extended,security-and-quality
+
+      # Autobuild attempts to build any compiled languages  (C/C++, C#, Go, or Java).
+      # If this step fails, then you should remove it and run the build manually (see below)
+      - name: Autobuild
+        if: ${{ !inputs.build-command }}
+        uses: github/codeql-action/autobuild@v2
+        with:
+          token: ${{ steps.get-token.outputs.BOT_TOKEN }}
+
+      - name: Manual build
+        if: ${{ inputs.build-command }}
+        run: |
+          ${{ inputs.build-command }}
+        env:
+          GITHUB_TOKEN: ${{ steps.get-token.outputs.BOT_TOKEN }}
+
+      # ℹ️ Command-line programs to run using the OS shell.
+      # 📚 See https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_idstepsrun
+
+      #   If the Autobuild fails above, remove it and uncomment the following three lines.
+      #   modify them (or add more) to build your code if your project, please refer to the EXAMPLE below for guidance.
+
+      # - run: |
+      #     echo "Run, Build Application using script"
+      #     ./location_of_script_within_repo/buildscript.sh
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v2
+        with:
+          category: "/language:${{matrix.language}}"
+          upload: false
+          output: codeql-results
+          token: ${{ steps.get-token.outputs.BOT_TOKEN }}
+
+      - name: Upload CodeQL Report
+        uses: actions/upload-artifact@v3
+        with:
+          name: codeql-results
+          path: codeql-results
+          if-no-files-found: warn

@@ -9,5 +9,14 @@ updates:
       interval: daily
     commit-message:
       prefix: "⬆️ github-actions"
-      # prefix-development: "⬆️ chore"
+      #prefix-development: "⬆️ chore"
+      include: "scope"
+
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: daily
+    commit-message:
+      prefix: "⬆️ npm"
+      #prefix-development: "⬆️ chore"
       include: "scope"

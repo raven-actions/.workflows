@@ -13,4 +13,8 @@
 # Common files config
 *.jpg -text
 *.png -text
+*.gif -text
+*.mp4 -text
 *.pdf -text
+
+dist/** -diff linguist-generated=true
