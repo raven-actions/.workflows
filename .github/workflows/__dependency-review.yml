@@ -52,8 +52,6 @@ jobs:
         uses: actions/dependency-review-action@v3
         with:
           repo-token: ${{ steps.get-token.outputs.BOT_TOKEN }}
-          # config-file: raven-actions/.workflows/.github/dependency-review-config.yml@main
-          # external-repo-token: ${{ steps.get-token.outputs.BOT_TOKEN }}
           vulnerability-check: true
           license-check: true
           comment-summary-in-pr: true

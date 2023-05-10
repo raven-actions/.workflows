@@ -102,12 +102,6 @@ jobs:
           labels: ${{ inputs.labels }}
           ignore_label: ${{ inputs.ignore-label }}
 
-      # - name: Approve a PR
-      #   if: ${{ inputs.branch-prefix == 'dependabot' }}
-      #   run: gh pr review --approve "${{ steps.combine-prs.outputs.pr_url }}"
-      #   env:
-      #     GITHUB_TOKEN: ${{ steps.get-token.outputs.BOT_TOKEN }}
-
       - name: Auto-merge PRs
         if: ${{ inputs.branch-prefix == 'dependabot' }}
         run: gh pr merge --auto --delete-branch --squash "${{ steps.combine-prs.outputs.pr_url }}"
