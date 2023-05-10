@@ -19,14 +19,14 @@ env:
 
 jobs:
   dependency-review:
-    name: Dependency Review
+    name: 🔀 Dependency Review
     if: ${{ github.repository_visibility == 'public' && (github.event_name == 'pull_request' && !github.event.pull_request.draft && !contains(fromJSON('["closed", "converted_to_draft"]'), github.event.action)) }}
     runs-on: ${{ inputs.runs-on }}
     # permissions:
     #   contents: read
     #   pull-requests: write
     steps:
-      - name: Debug
+      - name: 🩺 Debug
         if: ${{ env.DEBUG == 'true' }}
         uses: raven-actions/debug@v1
         with:
@@ -35,7 +35,7 @@ jobs:
           needs-context: ${{ toJson(needs) }}
           inputs-context: ${{ toJson(inputs) }}
 
-      - name: Get GitHub App Token
+      - name: 🔑 Get GitHub Token
         uses: wow-actions/use-app-token@v2
         id: get-token
         with:
@@ -43,12 +43,12 @@ jobs:
           private_key: ${{ secrets.ORG_BOT_PRIVATE_KEY }}
           fallback: ${{ github.token }}
 
-      - name: Checkout
+      - name: ⤵️ Checkout
         uses: actions/checkout@v3
         with:
           token: ${{ steps.get-token.outputs.BOT_TOKEN }}
 
-      - name: Dependency Review
+      - name: 🔀 Dependency Review
         uses: actions/dependency-review-action@v3
         with:
           repo-token: ${{ steps.get-token.outputs.BOT_TOKEN }}

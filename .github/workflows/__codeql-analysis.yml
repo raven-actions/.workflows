@@ -1,5 +1,5 @@
 ---
-name: CodeQL Analyze
+name: CodeQL
 
 on:
   workflow_call:
@@ -27,7 +27,7 @@ env:
 jobs:
   analyze:
     if: ${{ github.repository_visibility == 'public' }}
-    name: Analyze
+    name: 🩺 Analyze
     runs-on: ${{ inputs.runs-on }}
     # permissions:
     #   contents: read
@@ -38,7 +38,7 @@ jobs:
       matrix:
         language: ${{fromJson(inputs.languages)}}
     steps:
-      - name: Debug
+      - name: 🩺 Debug
         if: ${{ env.DEBUG == 'true' }}
         uses: raven-actions/debug@v1
         with:
@@ -47,7 +47,7 @@ jobs:
           needs-context: ${{ toJson(needs) }}
           inputs-context: ${{ toJson(inputs) }}
 
-      - name: Get GitHub App Token
+      - name: 🔑 Get GitHub Token
         uses: wow-actions/use-app-token@v2
         id: get-token
         with:
@@ -55,12 +55,12 @@ jobs:
           private_key: ${{ secrets.ORG_BOT_PRIVATE_KEY }}
           fallback: ${{ github.token }}
 
-      - name: Checkout
+      - name: ⤵️ Checkout
         uses: actions/checkout@v3
         with:
           token: ${{ steps.get-token.outputs.BOT_TOKEN }}
 
-      - name: Initialize CodeQL
+      - name: 🚧 Initialize CodeQL
         uses: github/codeql-action/init@v2
         with:
           config-file: ${{ inputs.config-file }}
@@ -77,13 +77,13 @@ jobs:
 
       # Autobuild attempts to build any compiled languages  (C/C++, C#, Go, or Java).
       # If this step fails, then you should remove it and run the build manually (see below)
-      - name: Auto build
+      - name: 🏗️ Auto build
         if: ${{ !inputs.build-command }}
         uses: github/codeql-action/autobuild@v2
         with:
           token: ${{ steps.get-token.outputs.BOT_TOKEN }}
 
-      - name: Manual build
+      - name: 🏗️ Manual build
         if: ${{ inputs.build-command }}
         run: |
           ${{ inputs.build-command }}
@@ -100,7 +100,7 @@ jobs:
       #     echo "Run, Build Application using script"
       #     ./location_of_script_within_repo/buildscript.sh
 
-      - name: Perform CodeQL Analysis
+      - name: 🩺 Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v2
         with:
           category: "/language:${{matrix.language}}"
@@ -108,7 +108,7 @@ jobs:
           output: codeql-results
           token: ${{ steps.get-token.outputs.BOT_TOKEN }}
 
-      - name: Upload CodeQL Report
+      - name: 📤 Upload CodeQL Report
         uses: actions/upload-artifact@v3
         with:
           name: codeql-results

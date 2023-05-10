@@ -37,7 +37,7 @@ env:
 
 jobs:
   draft-release:
-    name: Draft Release
+    name: 📝 Draft Release
     outputs:
       id: ${{ steps.release-drafter.outputs.id }}
       name: ${{ steps.release-drafter.outputs.name }}
@@ -49,7 +49,7 @@ jobs:
     #   pull-requests: read
     runs-on: ${{ inputs.runs-on }}
     steps:
-      - name: Debug
+      - name: 🩺 Debug
         if: ${{ env.DEBUG == 'true' }}
         uses: raven-actions/debug@v1
         with:
@@ -58,7 +58,7 @@ jobs:
           needs-context: ${{ toJson(needs) }}
           inputs-context: ${{ toJson(inputs) }}
 
-      - name: Get GitHub App Token
+      - name: 🔑 Get GitHub Token
         uses: wow-actions/use-app-token@v2
         id: get-token
         with:
@@ -66,7 +66,7 @@ jobs:
           private_key: ${{ secrets.ORG_BOT_PRIVATE_KEY }}
           fallback: ${{ github.token }}
 
-      - name: Run Release Drafter
+      - name: 📝 Run Release Drafter
         uses: release-drafter/release-drafter@v5
         id: release-drafter
         with:
@@ -74,7 +74,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ steps.get-token.outputs.BOT_TOKEN }}
 
-      - name: Set Release URL in the Summary
+      - name: ✍️ Set Release URL in the Summary
         if: ${{ runner.os != 'Windows' }}
         run: |
           echo "${RELEASE_URL}"
@@ -83,7 +83,7 @@ jobs:
         env:
           RELEASE_URL: ${{ steps.release-drafter.outputs.html_url }}
 
-      - name: Set Release URL in the Summary
+      - name: ✍️ Set Release URL in the Summary
         if: ${{ runner.os == 'Windows' }}
         run: |
           Write-Output "${env:RELEASE_URL}"

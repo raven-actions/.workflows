@@ -29,7 +29,7 @@ env:
 
 jobs:
   stale:
-    name: Close or stale Issues and PRs
+    name: ✖️ Close or stale Issues and PRs
     outputs:
       closed-issues-prs: ${{ steps.stale.outputs.id }}
       staled-issues-prs: ${{ steps.stale.outputs.name }}
@@ -39,7 +39,7 @@ jobs:
     #   pull-requests: write
     runs-on: ${{ inputs.runs-on }}
     steps:
-      - name: Debug
+      - name: 🩺 Debug
         if: ${{ env.DEBUG == 'true' }}
         uses: raven-actions/debug@v1
         with:
@@ -48,7 +48,7 @@ jobs:
           needs-context: ${{ toJson(needs) }}
           inputs-context: ${{ toJson(inputs) }}
 
-      - name: Get GitHub App Token
+      - name: 🔑 Get GitHub Token
         uses: wow-actions/use-app-token@v2
         id: get-token
         with:
@@ -56,7 +56,7 @@ jobs:
           private_key: ${{ secrets.ORG_BOT_PRIVATE_KEY }}
           fallback: ${{ github.token }}
 
-      - name: Stale
+      - name: ✖️ Stale
         uses: actions/stale@v8
         id: stale
         with:

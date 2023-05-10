@@ -38,7 +38,7 @@ env:
 
 jobs:
   gh-release:
-    name: Publish Release
+    name: 📦 Publish Release
     outputs:
       id: ${{ steps.gh-release.outputs.id }}
       url: ${{ steps.gh-release.outputs.url }}
@@ -48,7 +48,7 @@ jobs:
     #   contents: write
     runs-on: ${{ inputs.runs-on }}
     steps:
-      - name: Debug
+      - name: 🩺 Debug
         if: ${{ env.DEBUG == 'true' }}
         uses: raven-actions/debug@v1
         with:
@@ -57,7 +57,7 @@ jobs:
           needs-context: ${{ toJson(needs) }}
           inputs-context: ${{ toJson(inputs) }}
 
-      - name: Get GitHub App Token
+      - name: 🔑 Get GitHub Token
         uses: wow-actions/use-app-token@v2
         id: get-token
         with:
@@ -65,14 +65,14 @@ jobs:
           private_key: ${{ secrets.ORG_BOT_PRIVATE_KEY }}
           fallback: ${{ github.token }}
 
-      - name: Update release to the latest
+      - name: 🥇 Update release to the latest
         id: gh-release
         uses: softprops/action-gh-release@v1
         with:
           prerelease: ${{ inputs.prerelease }}
           token: ${{ steps.get-token.outputs.BOT_TOKEN }}
 
-      - name: Update the major tag to include the ${{ inputs.tag-name }} changes
+      - name: 🥇 Update the major tag to include the ${{ inputs.tag-name }} changes
         id: major-tag
         uses: actions/publish-action@v0.2.2
         with:

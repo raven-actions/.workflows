@@ -19,14 +19,14 @@ env:
 
 jobs:
   linter:
-    name: Linter
+    name: ✔️ Linter
     if: ${{ github.event_name == 'push' || (github.event_name == 'pull_request' && !github.event.pull_request.draft && !contains(fromJSON('["closed", "converted_to_draft"]'), github.event.action)) }}
     runs-on: ${{ inputs.runs-on }}
     # permissions:
     #   contents: read
     #   pull-requests: read
     steps:
-      - name: Debug
+      - name: 🩺 Debug
         if: ${{ env.DEBUG == 'true' }}
         uses: raven-actions/debug@v1
         with:
@@ -35,7 +35,7 @@ jobs:
           needs-context: ${{ toJson(needs) }}
           inputs-context: ${{ toJson(inputs) }}
 
-      - name: Get GitHub App Token
+      - name: 🔑 Get GitHub Token
         uses: wow-actions/use-app-token@v2
         id: get-token
         with:
@@ -43,29 +43,29 @@ jobs:
           private_key: ${{ secrets.ORG_BOT_PRIVATE_KEY }}
           fallback: ${{ github.token }}
 
-      - name: Checkout
+      - name: ⤵️ Checkout
         uses: actions/checkout@v3
         with:
           token: ${{ steps.get-token.outputs.BOT_TOKEN }}
 
-      - name: Setup Python
+      - name: 🚧 Setup Python
         uses: actions/setup-python@v4
         with:
           python-version: 3.11
 
-      - name: Cache pre-commit
+      - name: 🚅 Cache pre-commit
         uses: actions/cache@v3
         with:
           path: ~/.cache/pre-commit
           key: pre-commit-3|${{ env.pythonLocation }}|${{ hashFiles('.pre-commit-config.yaml') }}
 
-      - name: Install pre-commit
+      - name: 🚧 Install pre-commit
         run: python3 -m pip install --upgrade pre-commit
 
-      - name: Run pre-commit
+      - name: ✔️ Run pre-commit
         run: pre-commit run --all-files --show-diff-on-failure --color always
 
-      - name: Detect changes
+      - name: 🔁 Detect changes
         uses: dorny/paths-filter@v2
         id: changes
         with:
@@ -76,13 +76,13 @@ jobs:
             md:
               - '**/*.md'
 
-      - name: actionlint
+      - name: ✔️ actionlint
         if: ${{ steps.changes.outputs.gh-workflows == 'true' }}
         uses: raven-actions/actionlint@v1
         with:
           flags: "-ignore SC2086"
 
-      - name: Markdown Links
+      - name: 🌐 Markdown Links
         if: ${{ steps.changes.outputs.md == 'true' }}
         uses: gaurav-nelson/github-action-markdown-link-check@v1
         with:
