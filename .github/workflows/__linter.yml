@@ -47,24 +47,7 @@ jobs:
         uses: actions/checkout@v3
         with:
           token: ${{ steps.get-token.outputs.BOT_TOKEN }}
-
-      - name: 🚧 Setup Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: 3.11
-
-      - name: 🚅 Cache pre-commit
-        uses: actions/cache@v3
-        with:
-          path: ~/.cache/pre-commit
-          key: pre-commit-3|${{ env.pythonLocation }}|${{ hashFiles('.pre-commit-config.yaml') }}
-
-      - name: 🚧 Install pre-commit
-        run: python3 -m pip install --upgrade pre-commit
-
-      - name: ✔️ Run pre-commit
-        run: pre-commit run --all-files --show-diff-on-failure --color always
-
+          
       - name: 🔁 Detect changes
         uses: dorny/paths-filter@v2
         id: changes
@@ -75,6 +58,27 @@ jobs:
               - '.github/workflows/**'
             md:
               - '**/*.md'
+            changed:
+              - '**'
+
+      - name: 🚧 Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.11
+
+      - name: 🚧 Install pre-commit
+        run: python3 -m pip install --upgrade pre-commit
+        
+      - name: 🚅 Cache pre-commit
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pre-commit
+          key: pre-commit-3|${{ env.pythonLocation }}|${{ hashFiles('.pre-commit-config.yaml') }}
+
+      - name: ✔️ Run pre-commit
+        run: pre-commit run --show-diff-on-failure --color always ${{ (github.event_name == 'pull_request' && format('--files {0}', steps.changes.outputs.changed_files)) || '--all-files' }}
+        env:
+          SKIP: ${{ (github.event_name == 'push' && 'no-commit-to-branch') || '' }}
 
       - name: ✔️ actionlint
         if: ${{ steps.changes.outputs.gh-workflows == 'true' }}
