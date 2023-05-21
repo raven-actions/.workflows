@@ -98,7 +98,7 @@ jobs:
 
       - name: 🌐 Run lychee (markdown links)
         if: ${{ steps.changes.outputs.md == 'true' }}
-        uses: lycheeverse/lychee-action@v1.8.0
+        uses: lycheeverse/lychee-action@v1
         with:
           args: --config ".github/linters/.lychee.toml" --verbose --no-progress './**/*.md'
           format: detailed
