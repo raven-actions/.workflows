@@ -8,11 +8,6 @@ on:
         description: Tag name that the major tag will point to
         type: string
         required: true
-      prerelease:
-        description: Whether to create a pre-release or not
-        required: false
-        type: boolean
-        default: false
       runs-on:
         description: The type of runner to use
         required: false
@@ -38,7 +33,7 @@ env:
 
 jobs:
   gh-release:
-    name: 📦 Publish Release
+    name: 🚀 Publish Release
     outputs:
       id: ${{ steps.gh-release.outputs.id }}
       url: ${{ steps.gh-release.outputs.url }}
@@ -57,7 +52,7 @@ jobs:
           needs-context: ${{ toJson(needs) }}
           inputs-context: ${{ toJson(inputs) }}
 
-      - name: 🔑 Get GitHub Token
+      - name: 🔑 Get Token
         uses: wow-actions/use-app-token@v2
         id: get-token
         with:
@@ -65,12 +60,25 @@ jobs:
           private_key: ${{ secrets.ORG_BOT_PRIVATE_KEY }}
           fallback: ${{ github.token }}
 
+      # - name: 🥇 Update release to the latest
+      #   id: gh-release
+      #   uses: softprops/action-gh-release@v1
+      #   with:
+      #     prerelease: ${{ inputs.prerelease }}
+      #     token: ${{ steps.get-token.outputs.BOT_TOKEN }}
+
       - name: 🥇 Update release to the latest
-        id: gh-release
-        uses: softprops/action-gh-release@v1
-        with:
-          prerelease: ${{ inputs.prerelease }}
-          token: ${{ steps.get-token.outputs.BOT_TOKEN }}
+        run: |
+          _release_id=$(gh api -H "Accept: application/vnd.github+json" "/repos/${GITHUB_REPOSITORY}/releases/tags/${TAG_NAME}" --jq .id)
+          gh api \
+            --method PATCH \
+            -H "Accept: application/vnd.github+json" \
+            "/repos/${GITHUB_REPOSITORY}/releases/${_release_id}" \
+            -F prerelease=false \
+            -F make_latest=true
+        env:
+          GITHUB_TOKEN: ${{ steps.get-token.outputs.BOT_TOKEN }}
+          TAG_NAME: ${{ inputs.tag-name }}
 
       - name: 🥇 Update the major tag to include the ${{ inputs.tag-name }} changes
         id: major-tag
