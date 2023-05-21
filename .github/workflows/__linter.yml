@@ -82,8 +82,25 @@ jobs:
         with:
           flags: "-ignore SC2086"
 
+      - name: aaa
+        if: ${{ steps.changes.outputs.md == 'true' }}
+        run: |
+          gh api -H "Accept: application/vnd.github.raw" "/repos/raven-actions/.workflows/contents/${LINTER_CONFIG}" > "${LINTER_CONFIG}"
+        env:
+          GITHUB_TOKEN: ${{ steps.get-token.outputs.BOT_TOKEN }}
+          LINTER_CONFIG: .github/linters/.lychee.toml
+
       - name: 🌐 Markdown Links
         if: ${{ steps.changes.outputs.md == 'true' }}
-        uses: gaurav-nelson/github-action-markdown-link-check@v1
-        with:
-          config-file: .github/linters/.markdown-link-check.json
+        uses: lycheeverse/lychee-action@v1.8.0
+        env:
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+          format: detailed
+          args: --config ".github/linters/.lychee.toml" --verbose --no-progres
+          fail: true
+
+      # - name: 🌐 Markdown Links
+      #   if: ${{ steps.changes.outputs.md == 'true' }}
+      #   uses: gaurav-nelson/github-action-markdown-link-check@v1
+      #   with:
+      #     config-file: .github/linters/.markdown-link-check.json
