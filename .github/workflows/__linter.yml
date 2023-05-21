@@ -89,6 +89,7 @@ jobs:
       - name: 📃 Get config (lychee)
         if: ${{ steps.changes.outputs.md == 'true' }}
         run: |
+          mkdir -p $(dirname "${LINTER_CONFIG}")
           gh api -H "Accept: application/vnd.github.raw" "/repos/raven-actions/.workflows/contents/${LINTER_CONFIG}" > "${LINTER_CONFIG}"
         env:
           GITHUB_TOKEN: ${{ steps.get-token.outputs.BOT_TOKEN }}
