@@ -80,7 +80,7 @@ jobs:
         env:
           SKIP: ${{ (github.event_name == 'push' && 'no-commit-to-branch') || '' }}
 
-      - name: ✔️ actionlint
+      - name: ✔️ Run actionlint
         if: ${{ steps.changes.outputs.gh-workflows == 'true' }}
         uses: raven-actions/actionlint@v1
         with:
@@ -94,11 +94,11 @@ jobs:
           GITHUB_TOKEN: ${{ steps.get-token.outputs.BOT_TOKEN }}
           LINTER_CONFIG: .github/linters/.lychee.toml
 
-      - name: 🌐 Markdown Links
+      - name: 🌐 Run lychee
         if: ${{ steps.changes.outputs.md == 'true' }}
         uses: lycheeverse/lychee-action@v1.8.0
         with:
-          args: --config ".github/linters/.lychee.toml" --verbose --no-progres './**/*.md'
+          args: --config ".github/linters/.lychee.toml" --verbose --no-progress './**/*.md'
           format: detailed
           fail: true
         env:
