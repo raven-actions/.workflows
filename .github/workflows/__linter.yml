@@ -96,7 +96,7 @@ jobs:
           REPO_OWNER: ${{ github.repository_owner }}
           LINTER_CONFIG: .github/linters/.lychee.toml
 
-      - name: 🌐 Run lychee
+      - name: 🌐 Run lychee (markdown links)
         if: ${{ steps.changes.outputs.md == 'true' }}
         uses: lycheeverse/lychee-action@v1.8.0
         with:
