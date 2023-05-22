@@ -100,7 +100,7 @@ jobs:
         if: ${{ steps.changes.outputs.md == 'true' }}
         uses: lycheeverse/lychee-action@v1
         with:
-          args: --config ".github/linters/.lychee.toml" --verbose --no-progress './**/*.md'
+          args: --config ".github/linters/.lychee.toml" --no-progress ${{ steps.changes.outputs.md_files }}
           format: detailed
           fail: true
         env:
