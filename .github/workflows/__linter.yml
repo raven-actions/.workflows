@@ -53,6 +53,7 @@ jobs:
         id: changes
         with:
           token: ${{ steps.get-token.outputs.BOT_TOKEN }}
+          list-files: shell
           filters: |
             gh-workflows:
               - '.github/workflows/**'
