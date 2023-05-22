@@ -22,7 +22,7 @@ on:
         default: "['TypeScript']"
       config-file:
         description: Optional input to set path to a CodeQL config file
-        required: true
+        required: false
         type: string
       build-command:
         description: Optional input to specify manual build command. The multiline syntax is supported
@@ -78,7 +78,7 @@ jobs:
       - name: 🚧 Initialize CodeQL
         uses: github/codeql-action/init@v2
         with:
-          config-file: ${{ inputs.config-file }}
+          config-file: ${{ (inputs.config-file != '' && inputs.config-file) || '' }}
           languages: ${{ matrix.language }}
           # source-root: src
           queries: +security-and-quality
