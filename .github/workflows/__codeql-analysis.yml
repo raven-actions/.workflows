@@ -108,9 +108,15 @@ jobs:
           output: codeql-results
           token: ${{ steps.get-token.outputs.BOT_TOKEN }}
 
-      - name: 📤 Upload CodeQL Report
-        uses: actions/upload-artifact@v3
+#       - name: 📤 Upload CodeQL Report
+#         uses: actions/upload-artifact@v3
+#         with:
+#           name: codeql-results
+#           path: codeql-results
+#           if-no-files-found: warn
+          
+      - name: 📤 Upload Results
+        uses: github/codeql-action/upload-sarif@v2
         with:
-          name: codeql-results
-          path: codeql-results
-          if-no-files-found: warn
+          sarif_file: codeql-results
+          wait-for-processing: true
