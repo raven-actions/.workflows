@@ -20,6 +20,11 @@ on:
         required: false
         type: string
         default: "['TypeScript']"
+      source-root:
+        description: Optional input to set path to the source code
+        required: false
+        type: string
+        default: "."
       config-file:
         description: Optional input to set path to a CodeQL config file
         required: false
@@ -80,8 +85,8 @@ jobs:
         with:
           config-file: ${{ (inputs.config-file != '' && inputs.config-file) || '' }}
           languages: ${{ matrix.language }}
-          # source-root: src
-          queries: +security-and-quality
+          source-root: ${{ inputs.source-root }}
+          queries: ${{ (inputs.config-file != '' && '') || '+security-and-quality' }}
           token: ${{ steps.get-token.outputs.BOT_TOKEN }}
           # If you wish to specify custom queries, you can do so here or in a config file.
           # By default, queries listed here will override any specified in a config file.
