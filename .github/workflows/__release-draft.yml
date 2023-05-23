@@ -60,7 +60,7 @@ jobs:
           needs-context: ${{ toJson(needs) }}
           inputs-context: ${{ toJson(inputs) }}
 
-      - name: 🔑 Get GitHub Token
+      - name: 🔑 Get Token
         uses: wow-actions/use-app-token@v2
         id: get-token
         with:
@@ -72,6 +72,7 @@ jobs:
         run: |
           mkdir -p $(dirname "${CONFIG_FILE}")
           gh api -H "Accept: application/vnd.github.raw" "/repos/${REPO_OWNER}/.workflows/contents/${CONFIG_FILE}" > "${CONFIG_FILE}"
+          tree
         env:
           GITHUB_TOKEN: ${{ steps.get-token.outputs.BOT_TOKEN }}
           REPO_OWNER: ${{ github.repository_owner }}
