@@ -47,8 +47,6 @@ jobs:
     # permissions:
     #   contents: write
     #   pull-requests: read
-    env:
-      CONFIG_FILE: .github/configs/release-drafter.yml
     runs-on: ${{ inputs.runs-on }}
     steps:
       - name: 🩺 Debug
@@ -82,12 +80,13 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ steps.get-token.outputs.BOT_TOKEN }}
           REPO_OWNER: ${{ github.repository_owner }}
+          CONFIG_FILE: .github/configs/release-drafter.yml
 
       - name: 📝 Run Release Drafter
         uses: release-drafter/release-drafter@v5
         id: release-drafter
         with:
-          config-name: ${{ env.CONFIG_FILE }}
+          config-name: configs/release-drafter.yml
           prerelease: ${{ inputs.prerelease }}
         env:
           GITHUB_TOKEN: ${{ steps.get-token.outputs.BOT_TOKEN }}
