@@ -70,6 +70,8 @@ jobs:
 
       - name: ⚙️ Get config (release drafter)
         run: |
+          echo "/repos/${REPO_OWNER}/.workflows/contents/${CONFIG_FILE}"
+          echo $(dirname "${CONFIG_FILE}")
           mkdir -p $(dirname "${CONFIG_FILE}")
           gh api -H "Accept: application/vnd.github.raw" "/repos/${REPO_OWNER}/.workflows/contents/${CONFIG_FILE}" > "${CONFIG_FILE}"
           tree
