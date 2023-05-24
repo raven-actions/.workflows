@@ -67,6 +67,11 @@ jobs:
           app_id: ${{ secrets.ORG_BOT_APP_ID }}
           private_key: ${{ secrets.ORG_BOT_PRIVATE_KEY }}
           fallback: ${{ github.token }}
+          
+      - name: ⤵️ Checkout
+        uses: actions/checkout@v3
+        with:
+          token: ${{ steps.get-token.outputs.BOT_TOKEN }}
 
       - name: ⚙️ Get config (release drafter)
         run: |
