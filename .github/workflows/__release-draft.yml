@@ -76,7 +76,7 @@ jobs:
           mkdir -p $(dirname "${CONFIG_FILE}")
           #gh api -H "Accept: application/vnd.github.raw" "/repos/${REPO_OWNER}/.workflows/contents/${CONFIG_FILE}" > "${CONFIG_FILE}"
           gh api -H "Accept: application/vnd.github+json" "/repos/${REPO_OWNER}/.workflows/contents/${CONFIG_FILE}" --jq .content | base64 --decode > "${CONFIG_FILE}"
-          tree
+          tree -a
         env:
           GITHUB_TOKEN: ${{ steps.get-token.outputs.BOT_TOKEN }}
           REPO_OWNER: ${{ github.repository_owner }}
