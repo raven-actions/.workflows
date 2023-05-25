@@ -122,7 +122,7 @@ jobs:
         with:
           category: "/language:${{matrix.language}}"
           upload: true
-          output: codeql-results
+          #output: codeql-results
           token: ${{ steps.get-token.outputs.BOT_TOKEN }}
 
 #       - name: 📤 Upload CodeQL Report
