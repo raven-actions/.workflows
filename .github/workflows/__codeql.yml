@@ -33,10 +33,6 @@ on:
         description: Optional input to specify manual build command. The multiline syntax is supported
         required: false
         type: string
-      runs-on:
-        required: false
-        type: string
-        default: ubuntu-latest
 
 concurrency:
   group: ${{ format('{0}-{1}-{2}-{3}-{4}', github.workflow, github.event_name, github.ref, github.base_ref || null, github.head_ref || null) }}
@@ -49,7 +45,7 @@ jobs:
   analyze:
     if: ${{ github.repository_visibility == 'public' }}
     name: 🩺 Analyze
-    runs-on: ${{ inputs.runs-on }}
+    runs-on: ${{ (matrix.language == 'swift' && 'macos-latest') || 'ubuntu-latest' }}
     # permissions:
     #   contents: read
     #   actions: read
