@@ -8,6 +8,11 @@ on:
         description: Tag name that the major tag will point to
         type: string
         required: true
+      type:
+        description: Type of action
+        type: string
+        required: false
+        default: javascript
       runs-on:
         description: The type of runner to use
         required: false
@@ -59,6 +64,26 @@ jobs:
           app_id: ${{ secrets.ORG_BOT_APP_ID }}
           private_key: ${{ secrets.ORG_BOT_PRIVATE_KEY }}
           fallback: ${{ github.token }}
+          
+      - name: ⤵️ Checkout
+        uses: actions/checkout@v3
+        with:
+          token: ${{ steps.get-token.outputs.BOT_TOKEN }}
+
+      - name: 🚧 Setup Node
+        if: ${{ inputs.type == 'javascript' }}
+        uses: actions/setup-node@v3
+        with:
+          node-version-file: .node-version
+          cache: npm
+
+      - name: 🔀 Install dependencies
+        if: ${{ inputs.type == 'javascript' }}
+        run: npm ci
+
+      - name: 🏗️ Build
+        if: ${{ inputs.type == 'javascript' }}
+        run: npm run build:ci
           
       - name: 🤖 Get bot details
         id: bot-details
