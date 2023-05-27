@@ -96,7 +96,7 @@ jobs:
         uses: raven-actions/publish-and-tag@v1
         with:
           github_token: ${{ steps.get-token.outputs.BOT_TOKEN }}
-          tag_name: ${{ env.TAG_NAME }}
+          tag_name: ${{ inputs.tag-name }}
           rewrite_tags: true
           latest: true
           git_commit_message: ${{ format('🚀 {0} release', env.TAG_NAME) }}
