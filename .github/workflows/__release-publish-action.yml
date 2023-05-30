@@ -103,7 +103,7 @@ jobs:
           tag_name: ${{ inputs.tag-name }}
           rewrite_tags: true
           latest: true
-          git_commit_message: ${{ format('🚀 {0} release', env.TAG_NAME) }}
+          git_commit_message: ${{ format('🚀 {0} release', inputs.tag-name) }}
           git_author_name: ${{ steps.bot-details.outputs.name }}
           git_author_email: ${{ steps.bot-details.outputs.email }}
           git_committer_name: ${{ steps.bot-details.outputs.name }}
