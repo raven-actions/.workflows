@@ -57,6 +57,21 @@ jobs:
         with:
           token: ${{ steps.get-token.outputs.BOT_TOKEN }}
           fetch-depth: 0
+          
+      - name: 🔄️ Detect changes
+        id: changes-test
+        uses: tj-actions/changed-files@v36
+        with:
+          files: |
+            src/**
+            tests/**
+            package.json
+            package-lock.json
+            .node-version
+            jest.config.js
+            tsconfig.json
+            action.yml
+            codecov.yml
 
       - name: 🔄️ Detect changes
         uses: dorny/paths-filter@v2
