@@ -77,6 +77,7 @@ jobs:
         uses: dorny/paths-filter@v2
         id: changes
         with:
+          token: ${{ steps.get-token.outputs.BOT_TOKEN }}
           filters: |
             app:
               - 'src/**'
