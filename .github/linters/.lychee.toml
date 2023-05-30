@@ -23,4 +23,4 @@ accept = [200, 206, 429]
 headers = ['Accept-Encoding: deflate, compress, gzip, br, zstd']
 
 # Exclude URLs and mail addresses from checking (supports regex).
-exclude = ['https://www.linkedin.com/in/DariuszPorowski', 'node_modules']
+exclude = ['blob/main/.github/*', 'https://www.linkedin.com/in/DariuszPorowski', 'node_modules']
