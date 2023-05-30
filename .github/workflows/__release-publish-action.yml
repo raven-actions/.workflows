@@ -13,6 +13,10 @@ on:
         type: string
         required: false
         default: javascript
+      debug:
+        type: string
+        description: Debug mode
+        required: false
       runs-on:
         description: The type of runner to use
         required: false
@@ -34,7 +38,7 @@ on:
         value: ${{ jobs.gh-release.outputs.semver_major }}
 
 env:
-  DEBUG: ${{ secrets.ACTIONS_RUNNER_DEBUG || vars.ACTIONS_RUNNER_DEBUG || secrets.ACTIONS_STEP_DEBUG || vars.ACTIONS_STEP_DEBUG || false }}
+  DEBUG: ${{ inputs.debug || secrets.ACTIONS_RUNNER_DEBUG || vars.ACTIONS_RUNNER_DEBUG || secrets.ACTIONS_STEP_DEBUG || vars.ACTIONS_STEP_DEBUG || false }}
 
 jobs:
   gh-release:
