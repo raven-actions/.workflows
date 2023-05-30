@@ -18,7 +18,7 @@ env:
 
 jobs:
   build-test:
-    name: Build and Test
+    name: 🏗️🧪 Build and Test
     if: ${{ contains(fromJSON('["push", "workflow_dispatch"]'), github.event_name) || (github.event_name == 'pull_request' && !github.event.pull_request.draft) }}
 #     permissions:
 #       contents: read
