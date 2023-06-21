@@ -79,7 +79,7 @@ jobs:
       - name: ✔️ Run pre-commit
         run: pre-commit run --show-diff-on-failure --color always ${{ (github.event_name == 'pull_request' && format('--files {0}', steps.changes.outputs.changed_files)) || '--all-files' }}
         env:
-          SKIP: ${{ (github.event_name == 'push' && 'no-commit-to-branch') || '' }}
+          SKIP: ${{ (github.event_name == 'push' && 'no-commit-to-branch,pre-commit-autoupdate') || 'pre-commit-autoupdate' }}
 
       - name: ✔️ Run actionlint
         if: ${{ steps.changes.outputs.gh-workflows == 'true' }}
