@@ -60,7 +60,7 @@ jobs:
           
       - name: 🔄️ Detect changes
         id: changes-test
-        uses: tj-actions/changed-files@v36
+        uses: tj-actions/changed-files@v37
         with:
           files: |
             src/**
