@@ -91,7 +91,7 @@ jobs:
 
       - name: 🫂 Combine PRs
         id: combine-prs
-        uses: github/combine-prs@v3.1.1
+        uses: github/combine-prs@v3.1.2
         with:
           github_token: ${{ steps.get-token.outputs.BOT_TOKEN }}
           branch_prefix: ${{ inputs.branch-prefix }}
