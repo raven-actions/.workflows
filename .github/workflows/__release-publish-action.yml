@@ -97,7 +97,7 @@ jobs:
           
       - name: 🚀 Publish and Tag Action
         id: gh-release
-        uses: raven-actions/publish-and-tag@v1
+        uses: raven-actions/publish-and-tag@v2
         with:
           github_token: ${{ steps.get-token.outputs.BOT_TOKEN }}
           tag_name: ${{ inputs.tag-name }}
