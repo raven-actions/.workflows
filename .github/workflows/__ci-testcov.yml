@@ -53,14 +53,14 @@ jobs:
           fallback: ${{ github.token }}
 
       - name: ⤵️ Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           token: ${{ steps.get-token.outputs.BOT_TOKEN }}
           fetch-depth: 0
           
       - name: 🔄️ Detect changes
         id: changes-test
-        uses: tj-actions/changed-files@v36
+        uses: tj-actions/changed-files@v39
         with:
           files: |
             src/**
