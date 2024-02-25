@@ -57,7 +57,7 @@ jobs:
           fallback: ${{ github.token }}
 
       - name: ✖️ Stale
-        uses: actions/stale@v8
+        uses: actions/stale@v9
         id: stale
         with:
           # general
