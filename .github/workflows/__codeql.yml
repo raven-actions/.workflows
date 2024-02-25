@@ -78,7 +78,7 @@ jobs:
           token: ${{ steps.get-token.outputs.BOT_TOKEN }}
 
       - name: 🚧 Initialize CodeQL
-        uses: github/codeql-action/init@v2
+        uses: github/codeql-action/init@v3
         with:
           config-file: ${{ (inputs.config-file != '' && inputs.config-file) || '' }}
           languages: ${{ matrix.language }}
@@ -96,7 +96,7 @@ jobs:
       # If this step fails, then you should remove it and run the build manually (see below)
       - name: 🏗️ Auto build
         if: ${{ !inputs.build-command }}
-        uses: github/codeql-action/autobuild@v2
+        uses: github/codeql-action/autobuild@v3
         with:
           token: ${{ steps.get-token.outputs.BOT_TOKEN }}
 
@@ -118,7 +118,7 @@ jobs:
       #     ./location_of_script_within_repo/buildscript.sh
 
       - name: 🩺 Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@v2
+        uses: github/codeql-action/analyze@v3
         with:
           category: "/language:${{matrix.language}}"
           upload: false
