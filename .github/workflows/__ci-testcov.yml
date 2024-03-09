@@ -74,7 +74,7 @@ jobs:
             codecov.yml
 
       - name: 🔄️ Detect changes
-        uses: dorny/paths-filter@v2
+        uses: dorny/paths-filter@v3
         id: changes
         with:
           token: ${{ steps.get-token.outputs.BOT_TOKEN }}
