@@ -83,7 +83,7 @@ jobs:
 #           CONFIG_FILE: .github/configs/release-drafter.yml
 
       - name: 📝 Run Release Drafter
-        uses: release-drafter/release-drafter@v5
+        uses: release-drafter/release-drafter@v6
         id: release-drafter
         with:
           config-name: configs/release-drafter.yml
