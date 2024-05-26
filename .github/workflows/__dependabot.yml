@@ -44,7 +44,7 @@ jobs:
 
       - name: 📝 Fetch Dependabot metadata
         id: dependabot-metadata
-        uses: dependabot/fetch-metadata@v1
+        uses: dependabot/fetch-metadata@5e5f99653a5b510e8555840e80cbf1514ad4af38 # v2.1.0
         with:
           github-token: ${{ steps.get-token.outputs.token }}
           alert-lookup: true
