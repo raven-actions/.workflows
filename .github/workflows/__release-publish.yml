@@ -53,19 +53,18 @@ jobs:
           inputs-context: ${{ toJson(inputs) }}
 
       - name: 🔑 Get Token
-        uses: wow-actions/use-app-token@v2
+        uses: actions/create-github-app-token@a0de6af83968303c8c955486bf9739a57d23c7f1 # v1.10.0
         id: get-token
         with:
-          app_id: ${{ secrets.ORG_BOT_APP_ID }}
-          private_key: ${{ secrets.ORG_BOT_PRIVATE_KEY }}
-          fallback: ${{ github.token }}
+          app-id: ${{ secrets.ORG_BOT_APP_ID }}
+          private-key: ${{ secrets.ORG_BOT_PRIVATE_KEY }}
 
       # - name: 🥇 Update release to the latest
       #   id: gh-release
       #   uses: softprops/action-gh-release@v1
       #   with:
       #     prerelease: ${{ inputs.prerelease }}
-      #     token: ${{ steps.get-token.outputs.BOT_TOKEN }}
+      #     token: ${{ steps.get-token.outputs.token }}
 
       - name: 🥇 Update release to the latest
         run: |
@@ -77,7 +76,7 @@ jobs:
             -F prerelease=false \
             -F make_latest=true
         env:
-          GITHUB_TOKEN: ${{ steps.get-token.outputs.BOT_TOKEN }}
+          GITHUB_TOKEN: ${{ steps.get-token.outputs.token }}
           TAG_NAME: ${{ inputs.tag-name }}
 
       - name: 🥇 Update the major tag to include the ${{ inputs.tag-name }} changes
@@ -85,4 +84,4 @@ jobs:
         uses: actions/publish-action@v0.3.0
         with:
           source-tag: ${{ inputs.tag-name }}
-          token: ${{ steps.get-token.outputs.BOT_TOKEN }}
+          token: ${{ steps.get-token.outputs.token }}

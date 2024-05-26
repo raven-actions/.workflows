@@ -7,7 +7,7 @@ on:
         type: string
         description: Debug mode
         required: false
-        
+
 # Allow one concurrent
 concurrency:
   group: ${{ format('{0}-{1}-{2}-{3}-{4}', github.workflow, github.event_name, github.ref, github.base_ref, github.head_ref) }}
@@ -20,12 +20,12 @@ jobs:
   build-test:
     name: 🏗️🧪 Build and Test
     if: ${{ contains(fromJSON('["push", "workflow_dispatch"]'), github.event_name) || (github.event_name == 'pull_request' && !github.event.pull_request.draft) }}
-#     permissions:
-#       contents: read
-#       issues: read
-#       checks: write
-#       pull-requests: write
-#       actions: write
+    #     permissions:
+    #       contents: read
+    #       issues: read
+    #       checks: write
+    #       pull-requests: write
+    #       actions: write
     strategy:
       fail-fast: false
       matrix:
@@ -43,21 +43,20 @@ jobs:
           secrets-context: ${{ toJson(secrets) }}
           needs-context: ${{ toJson(needs) }}
           inputs-context: ${{ toJson(inputs) }}
-          
+
       - name: 🔑 Get Token
-        uses: wow-actions/use-app-token@v2
+        uses: actions/create-github-app-token@a0de6af83968303c8c955486bf9739a57d23c7f1 # v1.10.0
         id: get-token
         with:
-          app_id: ${{ secrets.ORG_BOT_APP_ID }}
-          private_key: ${{ secrets.ORG_BOT_PRIVATE_KEY }}
-          fallback: ${{ github.token }}
+          app-id: ${{ secrets.ORG_BOT_APP_ID }}
+          private-key: ${{ secrets.ORG_BOT_PRIVATE_KEY }}
 
       - name: ⤵️ Checkout
         uses: actions/checkout@v4
         with:
-          token: ${{ steps.get-token.outputs.BOT_TOKEN }}
+          token: ${{ steps.get-token.outputs.token }}
           fetch-depth: 0
-          
+
       - name: 🔄️ Detect changes
         id: changes-test
         uses: tj-actions/changed-files@v42
@@ -77,7 +76,7 @@ jobs:
         uses: dorny/paths-filter@v3
         id: changes
         with:
-          token: ${{ steps.get-token.outputs.BOT_TOKEN }}
+          token: ${{ steps.get-token.outputs.token }}
           filters: |
             app:
               - 'src/**'
@@ -115,7 +114,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: test-results
-          path: 'reports/jest-*.xml'
+          path: "reports/jest-*.xml"
           if-no-files-found: warn
 
       - name: 📤 Upload coverage results
@@ -130,9 +129,9 @@ jobs:
         if: ${{ steps.changes.outputs.app == 'true' && matrix.os == 'ubuntu-latest' }}
         uses: phoenix-actions/test-reporting@v12
         with:
-          token: ${{ steps.get-token.outputs.BOT_TOKEN }}
+          token: ${{ steps.get-token.outputs.token }}
           name: 📜 Test report
-          path: 'reports/jest-*.xml'
+          path: "reports/jest-*.xml"
           reporter: jest-junit
           output-to: step-summary
 

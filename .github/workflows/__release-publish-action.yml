@@ -62,17 +62,16 @@ jobs:
           inputs-context: ${{ toJson(inputs) }}
 
       - name: 🔑 Get Token
-        uses: wow-actions/use-app-token@v2
+        uses: actions/create-github-app-token@a0de6af83968303c8c955486bf9739a57d23c7f1 # v1.10.0
         id: get-token
         with:
-          app_id: ${{ secrets.ORG_BOT_APP_ID }}
-          private_key: ${{ secrets.ORG_BOT_PRIVATE_KEY }}
-          fallback: ${{ github.token }}
-          
+          app-id: ${{ secrets.ORG_BOT_APP_ID }}
+          private-key: ${{ secrets.ORG_BOT_PRIVATE_KEY }}
+
       - name: ⤵️ Checkout
         uses: actions/checkout@v4
         with:
-          token: ${{ steps.get-token.outputs.BOT_TOKEN }}
+          token: ${{ steps.get-token.outputs.token }}
 
       - name: 🚧 Setup Node
         if: ${{ inputs.type == 'javascript' }}
@@ -88,18 +87,18 @@ jobs:
       - name: 🏗️ Build
         if: ${{ inputs.type == 'javascript' }}
         run: npm run build:ci
-          
+
       - name: 🤖 Get bot details
         id: bot-details
         uses: raven-actions/bot-details@v1
         with:
-          bot-slug-name: ${{ steps.get-token.outputs.BOT_NAME }}
-          
+          bot-slug-name: ${{ steps.get-token.outputs.app-slug }}
+
       - name: 🚀 Publish and Tag Action
         id: gh-release
         uses: raven-actions/publish-and-tag@v2
         with:
-          github_token: ${{ steps.get-token.outputs.BOT_TOKEN }}
+          github_token: ${{ steps.get-token.outputs.token }}
           tag_name: ${{ inputs.tag-name }}
           rewrite_tags: true
           latest: true

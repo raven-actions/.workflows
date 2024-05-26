@@ -59,28 +59,27 @@ jobs:
           inputs-context: ${{ toJson(inputs) }}
 
       - name: 🔑 Get Token
-        uses: wow-actions/use-app-token@v2
+        uses: actions/create-github-app-token@a0de6af83968303c8c955486bf9739a57d23c7f1 # v1.10.0
         id: get-token
         with:
-          app_id: ${{ secrets.ORG_BOT_APP_ID }}
-          private_key: ${{ secrets.ORG_BOT_PRIVATE_KEY }}
-          fallback: ${{ github.token }}
-          
-#       - name: ⤵️ Checkout
-#         uses: actions/checkout@v3
-#         with:
-#           token: ${{ steps.get-token.outputs.BOT_TOKEN }}
+          app-id: ${{ secrets.ORG_BOT_APP_ID }}
+          private-key: ${{ secrets.ORG_BOT_PRIVATE_KEY }}
 
-#       - name: ⚙️ Get config (release drafter)
-#         run: |
-#           mkdir -p $(dirname "${CONFIG_FILE}")
-#           #gh api -H "Accept: application/vnd.github.raw" "/repos/${REPO_OWNER}/.workflows/contents/${CONFIG_FILE}" > "${CONFIG_FILE}"
-#           gh api -H "Accept: application/vnd.github+json" "/repos/${REPO_OWNER}/.workflows/contents/${CONFIG_FILE}" --jq .content | base64 --decode > "${CONFIG_FILE}"
-#           tree -a
-#         env:
-#           GITHUB_TOKEN: ${{ steps.get-token.outputs.BOT_TOKEN }}
-#           REPO_OWNER: ${{ github.repository_owner }}
-#           CONFIG_FILE: .github/configs/release-drafter.yml
+      #       - name: ⤵️ Checkout
+      #         uses: actions/checkout@v3
+      #         with:
+      #           token: ${{ steps.get-token.outputs.token }}
+
+      #       - name: ⚙️ Get config (release drafter)
+      #         run: |
+      #           mkdir -p $(dirname "${CONFIG_FILE}")
+      #           #gh api -H "Accept: application/vnd.github.raw" "/repos/${REPO_OWNER}/.workflows/contents/${CONFIG_FILE}" > "${CONFIG_FILE}"
+      #           gh api -H "Accept: application/vnd.github+json" "/repos/${REPO_OWNER}/.workflows/contents/${CONFIG_FILE}" --jq .content | base64 --decode > "${CONFIG_FILE}"
+      #           tree -a
+      #         env:
+      #           GITHUB_TOKEN: ${{ steps.get-token.outputs.token }}
+      #           REPO_OWNER: ${{ github.repository_owner }}
+      #           CONFIG_FILE: .github/configs/release-drafter.yml
 
       - name: 📝 Run Release Drafter
         uses: release-drafter/release-drafter@v5
@@ -89,7 +88,7 @@ jobs:
           config-name: configs/release-drafter.yml
           prerelease: ${{ inputs.prerelease }}
         env:
-          GITHUB_TOKEN: ${{ steps.get-token.outputs.BOT_TOKEN }}
+          GITHUB_TOKEN: ${{ steps.get-token.outputs.token }}
 
       - name: ✍️ Set Release URL in the Summary
         if: ${{ runner.os != 'Windows' }}

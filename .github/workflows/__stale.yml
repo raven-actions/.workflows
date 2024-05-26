@@ -49,19 +49,18 @@ jobs:
           inputs-context: ${{ toJson(inputs) }}
 
       - name: 🔑 Get GitHub Token
-        uses: wow-actions/use-app-token@v2
+        uses: actions/create-github-app-token@a0de6af83968303c8c955486bf9739a57d23c7f1 # v1.10.0
         id: get-token
         with:
-          app_id: ${{ secrets.ORG_BOT_APP_ID }}
-          private_key: ${{ secrets.ORG_BOT_PRIVATE_KEY }}
-          fallback: ${{ github.token }}
+          app-id: ${{ secrets.ORG_BOT_APP_ID }}
+          private-key: ${{ secrets.ORG_BOT_PRIVATE_KEY }}
 
       - name: ✖️ Stale
         uses: actions/stale@v9
         id: stale
         with:
           # general
-          repo-token: ${{ steps.get-token.outputs.BOT_TOKEN }}
+          repo-token: ${{ steps.get-token.outputs.token }}
           days-before-stale: ${{ env.DAYS_BEFORE_STALE }}
           days-before-close: ${{ env.DAYS_BEFORE_CLOSE }}
           # issues

@@ -65,17 +65,16 @@ jobs:
           inputs-context: ${{ toJson(inputs) }}
 
       - name: 🔑 Get GitHub Token
-        uses: wow-actions/use-app-token@v2
+        uses: actions/create-github-app-token@a0de6af83968303c8c955486bf9739a57d23c7f1 # v1.10.0
         id: get-token
         with:
-          app_id: ${{ secrets.ORG_BOT_APP_ID }}
-          private_key: ${{ secrets.ORG_BOT_PRIVATE_KEY }}
-          fallback: ${{ github.token }}
+          app-id: ${{ secrets.ORG_BOT_APP_ID }}
+          private-key: ${{ secrets.ORG_BOT_PRIVATE_KEY }}
 
       - name: ⤵️ Checkout
         uses: actions/checkout@v4
         with:
-          token: ${{ steps.get-token.outputs.BOT_TOKEN }}
+          token: ${{ steps.get-token.outputs.token }}
 
       - name: 🚧 Initialize CodeQL
         uses: github/codeql-action/init@v3
@@ -84,7 +83,7 @@ jobs:
           languages: ${{ matrix.language }}
           source-root: ${{ inputs.source-root }}
           queries: ${{ (inputs.config-file != '' && '') || '+security-and-quality' }}
-          token: ${{ steps.get-token.outputs.BOT_TOKEN }}
+          token: ${{ steps.get-token.outputs.token }}
           # If you wish to specify custom queries, you can do so here or in a config file.
           # By default, queries listed here will override any specified in a config file.
           # Prefix the list here with "+" to use these queries and those in the config file.
@@ -98,14 +97,14 @@ jobs:
         if: ${{ !inputs.build-command }}
         uses: github/codeql-action/autobuild@v3
         with:
-          token: ${{ steps.get-token.outputs.BOT_TOKEN }}
+          token: ${{ steps.get-token.outputs.token }}
 
       - name: 🏗️ Manual build
         if: ${{ inputs.build-command }}
         run: |
           ${{ inputs.build-command }}
         env:
-          GITHUB_TOKEN: ${{ steps.get-token.outputs.BOT_TOKEN }}
+          GITHUB_TOKEN: ${{ steps.get-token.outputs.token }}
 
       # ℹ️ Command-line programs to run using the OS shell.
       # 📚 See https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_idstepsrun
@@ -123,7 +122,7 @@ jobs:
           category: "/language:${{matrix.language}}"
           upload: false
           output: codeql-results
-          token: ${{ steps.get-token.outputs.BOT_TOKEN }}
+          token: ${{ steps.get-token.outputs.token }}
 
       - name: 📤 Upload CodeQL Report
         uses: actions/upload-artifact@v3
@@ -131,7 +130,6 @@ jobs:
           name: codeql-results
           path: codeql-results
           if-no-files-found: warn
-          
 #       - name: 📤 Upload Results
 #         uses: github/codeql-action/upload-sarif@v2
 #         with:
