@@ -28,7 +28,7 @@ jobs:
     steps:
       - name: 🩺 Debug
         if: ${{ env.DEBUG == 'true' }}
-        uses: raven-actions/debug@v1
+        uses: raven-actions/debug@13e7c5b2e0436a1b85276087eba43ec7d46bd955 # v1.1.0
         with:
           vars-context: ${{ toJson(vars) }}
           secrets-context: ${{ toJson(secrets) }}
@@ -42,12 +42,12 @@ jobs:
       #     app-id: ${{ secrets.ORG_BOT_APP_ID }}
       #     private-key: ${{ secrets.ORG_BOT_PRIVATE_KEY }}
       - name: ⤵️ Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         # with:
         #   token: ${{ steps.get-token.outputs.token }}
 
       - name: 🔁 Detect changes
-        uses: dorny/paths-filter@v3
+        uses: dorny/paths-filter@de90cc6fb38fc0963ad72b210f1f284cd68cea36 # v3.0.2
         id: changes
         with:
           # token: ${{ steps.get-token.outputs.token }}
@@ -61,7 +61,7 @@ jobs:
               - '**'
 
       - name: 🚧 Setup Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@0b93645e9fea7318ecaed2b359559ac225c90a2b # v5.3.0
         with:
           python-version: 3.12
 
@@ -69,7 +69,7 @@ jobs:
         run: python3 -m pip install --upgrade pre-commit
 
       - name: 🚅 Cache pre-commit
-        uses: actions/cache@v4
+        uses: actions/cache@1bd1e32a3bdc45362d1e726936510720a7c30a57 # v4.2.0
         with:
           path: ~/.cache/pre-commit
           key: pre-commit-3|${{ env.pythonLocation }}|${{ hashFiles('.pre-commit-config.yaml') }}
@@ -81,9 +81,9 @@ jobs:
 
       - name: ✔️ Run actionlint
         if: ${{ steps.changes.outputs.gh-workflows == 'true' }}
-        uses: raven-actions/actionlint@v2
+        uses: raven-actions/actionlint@01fce4f43a270a612932cb1c64d40505a029f821 # v2.0.0
         with:
-          flags: "-ignore SC2086"
+          flags: "-ignore SC2086 -ignore action"
 
       - name: ⚙️ Get config (lychee)
         if: ${{ steps.changes.outputs.md == 'true' }}

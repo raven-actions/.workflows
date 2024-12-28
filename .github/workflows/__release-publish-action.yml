@@ -54,7 +54,7 @@ jobs:
     steps:
       - name: 🩺 Debug
         if: ${{ env.DEBUG == 'true' }}
-        uses: raven-actions/debug@v1
+        uses: raven-actions/debug@13e7c5b2e0436a1b85276087eba43ec7d46bd955 # v1.1.0
         with:
           vars-context: ${{ toJson(vars) }}
           secrets-context: ${{ toJson(secrets) }}
@@ -69,28 +69,35 @@ jobs:
           private-key: ${{ secrets.ORG_BOT_PRIVATE_KEY }}
 
       - name: ⤵️ Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
           token: ${{ steps.get-token.outputs.token }}
 
+      - name: 🚧 Setup pnpm
+        if: ${{ inputs.type == 'javascript' }}
+        uses: pnpm/action-setup@fe02b34f77f8bc703788d5817da081398fad5dd2 # v4.0.0
+        with:
+          version: 9
+          run_install: false
+
       - name: 🚧 Setup Node
         if: ${{ inputs.type == 'javascript' }}
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@39370e3970a6d050c480ffad4ff0ed4d3fdee5af # v4.1.0
         with:
           node-version-file: .node-version
-          cache: npm
+          cache: pnpm
 
       - name: 🔀 Install dependencies
         if: ${{ inputs.type == 'javascript' }}
-        run: npm ci
+        run: pnpm deps:ci
 
       - name: 🏗️ Build
         if: ${{ inputs.type == 'javascript' }}
-        run: npm run build:ci
+        run: pnpm build:ci
 
       - name: 🤖 Get bot details
         id: bot-details
-        uses: raven-actions/bot-details@v1
+        uses: raven-actions/bot-details@b2d5fd6eb98adc0cb67df864daa834849f3a8bc0 #v1.1.0
         with:
           bot-slug-name: ${{ steps.get-token.outputs.app-slug }}
 

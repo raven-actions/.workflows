@@ -20,12 +20,13 @@ jobs:
   build-test:
     name: 🏗️🧪 Build and Test
     if: ${{ contains(fromJSON('["push", "workflow_dispatch"]'), github.event_name) || (github.event_name == 'pull_request' && !github.event.pull_request.draft) }}
-    #     permissions:
-    #       contents: read
-    #       issues: read
-    #       checks: write
-    #       pull-requests: write
-    #       actions: write
+    # permissions:
+    #   contents: read
+    #   issues: write
+    #   pull-requests: write
+    #   checks: write
+    #   actions: write
+    #   id-token: write
     strategy:
       fail-fast: false
       matrix:
@@ -37,7 +38,7 @@ jobs:
     steps:
       - name: 🩺 Debug
         if: ${{ env.DEBUG == 'true' }}
-        uses: raven-actions/debug@v1
+        uses: raven-actions/debug@13e7c5b2e0436a1b85276087eba43ec7d46bd955 # v1.1.0
         with:
           vars-context: ${{ toJson(vars) }}
           secrets-context: ${{ toJson(secrets) }}
@@ -52,28 +53,13 @@ jobs:
           private-key: ${{ secrets.ORG_BOT_PRIVATE_KEY }}
 
       - name: ⤵️ Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
           token: ${{ steps.get-token.outputs.token }}
           fetch-depth: 0
 
       - name: 🔄️ Detect changes
-        id: changes-test
-        uses: tj-actions/changed-files@v45
-        with:
-          files: |
-            src/**
-            tests/**
-            package.json
-            package-lock.json
-            .node-version
-            jest.config.js
-            tsconfig.json
-            action.yml
-            codecov.yml
-
-      - name: 🔄️ Detect changes
-        uses: dorny/paths-filter@v3
+        uses: dorny/paths-filter@de90cc6fb38fc0963ad72b210f1f284cd68cea36 # v3.0.2
         id: changes
         with:
           token: ${{ steps.get-token.outputs.token }}
@@ -83,35 +69,43 @@ jobs:
               - 'tests/**'
               - 'package.json'
               - 'package-lock.json'
+              - 'pnpm-lock.yaml'
               - '.node-version'
               - 'jest.config.js'
               - 'tsconfig.json'
               - 'action.yml'
               - 'codecov.yml'
 
+      - name: 🚧 Setup pnpm
+        if: ${{ steps.changes.outputs.app == 'true' }}
+        uses: pnpm/action-setup@fe02b34f77f8bc703788d5817da081398fad5dd2 # v4.0.0
+        with:
+          version: 9
+          run_install: false
+
       - name: 🚧 Setup Node
         if: ${{ steps.changes.outputs.app == 'true' }}
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@39370e3970a6d050c480ffad4ff0ed4d3fdee5af # v4.1.0
         with:
           node-version-file: .node-version
-          cache: npm
+          cache: pnpm
 
       - name: 🔀 Install dependencies
         if: ${{ steps.changes.outputs.app == 'true' }}
-        run: npm ci
+        run: pnpm deps:ci
 
       - name: 🏗️ Build
         if: ${{ steps.changes.outputs.app == 'true' }}
-        run: npm run build:ci
+        run: pnpm build:ci
 
       - name: 🧪 Test
         if: ${{ steps.changes.outputs.app == 'true' }}
-        run: npm run test:ci:cov
+        run: pnpm test:ci:cov
         continue-on-error: true
 
       - name: 📤 Upload test results
         if: ${{ steps.changes.outputs.app == 'true' && matrix.os == 'ubuntu-latest' }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@6f51ac03b9356f520e9adb1b1b7802705f340c2b # v4.5.0
         with:
           name: test-results
           path: "reports/jest-*.xml"
@@ -119,7 +113,7 @@ jobs:
 
       - name: 📤 Upload coverage results
         if: ${{ steps.changes.outputs.app == 'true' && matrix.os == 'ubuntu-latest' }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@6f51ac03b9356f520e9adb1b1b7802705f340c2b # v4.5.0
         with:
           name: coverage-results
           path: coverage
@@ -127,7 +121,7 @@ jobs:
 
       - name: 📜 Test report
         if: ${{ steps.changes.outputs.app == 'true' && matrix.os == 'ubuntu-latest' }}
-        uses: phoenix-actions/test-reporting@v15
+        uses: phoenix-actions/test-reporting@f957cd93fc2d848d556fa0d03c57bc79127b6b5e # v15
         with:
           token: ${{ steps.get-token.outputs.token }}
           name: 📜 Test report
@@ -137,7 +131,7 @@ jobs:
 
       - name: 📜 Coverage report
         if: ${{ steps.changes.outputs.app == 'true' && matrix.os == 'ubuntu-latest' }}
-        uses: codecov/codecov-action@v5
+        uses: codecov/codecov-action@1e68e06f1dbfde0e4cefc87efeba9e4643565303 # v5.1.2
         with:
-          token: ${{ secrets.CODECOV_TOKEN }}
+          use_oidc: true
           files: coverage/cobertura-coverage.xml

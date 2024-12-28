@@ -57,7 +57,7 @@ jobs:
     steps:
       - name: 🩺 Debug
         if: ${{ env.DEBUG == 'true' }}
-        uses: raven-actions/debug@v1
+        uses: raven-actions/debug@13e7c5b2e0436a1b85276087eba43ec7d46bd955 # v1.1.0
         with:
           vars-context: ${{ toJson(vars) }}
           secrets-context: ${{ toJson(secrets) }}
@@ -72,7 +72,7 @@ jobs:
           private-key: ${{ secrets.ORG_BOT_PRIVATE_KEY }}
 
       - name: ⤵️ Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
           token: ${{ steps.get-token.outputs.token }}
 
@@ -125,7 +125,7 @@ jobs:
           token: ${{ steps.get-token.outputs.token }}
 
       - name: 📤 Upload CodeQL Report
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@6f51ac03b9356f520e9adb1b1b7802705f340c2b # v4.5.0
         with:
           name: codeql-results
           path: codeql-results
