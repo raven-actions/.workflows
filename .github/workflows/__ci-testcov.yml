@@ -45,7 +45,7 @@ jobs:
           inputs-context: ${{ toJson(inputs) }}
 
       - name: 🔑 Get Token
-        uses: actions/create-github-app-token@21cfef2b496dd8ef5b904c159339626a10ad380e # v1.11.6
+        uses: actions/create-github-app-token@df432ceedc7162793a195dd1713ff69aefc7379e # v2.0.6
         id: get-token
         with:
           app-id: ${{ secrets.ORG_BOT_APP_ID }}
@@ -84,7 +84,7 @@ jobs:
 
       - name: 🚧 Setup Node
         if: ${{ steps.changes.outputs.app == 'true' }}
-        uses: actions/setup-node@1d0ff469b7ec7b3cb9d8673fde0c81c44821de2a # v4.2.0
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
           node-version-file: .node-version
           cache: pnpm
@@ -104,7 +104,7 @@ jobs:
 
       - name: 📤 Upload test results
         if: ${{ steps.changes.outputs.app == 'true' && matrix.os == 'ubuntu-latest' }}
-        uses: actions/upload-artifact@4cec3d8aa04e39d1a68397de0c4cd6fb9dce8ec1 # v4.6.1
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: test-results
           path: "reports/jest-*.xml"
@@ -112,7 +112,7 @@ jobs:
 
       - name: 📤 Upload coverage results
         if: ${{ steps.changes.outputs.app == 'true' && matrix.os == 'ubuntu-latest' }}
-        uses: actions/upload-artifact@4cec3d8aa04e39d1a68397de0c4cd6fb9dce8ec1 # v4.6.1
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: coverage-results
           path: coverage
@@ -130,7 +130,7 @@ jobs:
 
       - name: 📜 Coverage report
         if: ${{ steps.changes.outputs.app == 'true' && matrix.os == 'ubuntu-latest' }}
-        uses: codecov/codecov-action@0565863a31f2c772f9f0395002a31e3f06189574 # v5.4.0
+        uses: codecov/codecov-action@18283e04ce6e62d37312384ff67231eb8fd56d24 # v5.4.3
         with:
           use_oidc: true
           files: coverage/cobertura-coverage.xml
