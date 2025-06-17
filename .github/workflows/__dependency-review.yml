@@ -17,14 +17,15 @@ concurrency:
 env:
   DEBUG: ${{ secrets.ACTIONS_RUNNER_DEBUG || vars.ACTIONS_RUNNER_DEBUG || secrets.ACTIONS_STEP_DEBUG || vars.ACTIONS_STEP_DEBUG || false }}
 
+permissions:
+  contents: read
+  pull-requests: write
+
 jobs:
   dependency-review:
     name: 🔀 Dependency Review
     if: ${{ github.repository_visibility == 'public' && (github.event_name == 'pull_request' && !github.event.pull_request.draft && !contains(fromJSON('["closed", "converted_to_draft"]'), github.event.action)) }}
     runs-on: ${{ inputs.runs-on }}
-    # permissions:
-    #   contents: read
-    #   pull-requests: write
     steps:
       - name: 🩺 Debug
         if: ${{ env.DEBUG == 'true' }}
