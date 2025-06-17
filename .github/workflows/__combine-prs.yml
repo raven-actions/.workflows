@@ -77,7 +77,6 @@ jobs:
         uses: raven-actions/debug@13e7c5b2e0436a1b85276087eba43ec7d46bd955 # v1.1.0
         with:
           vars-context: ${{ toJson(vars) }}
-          secrets-context: ${{ toJson(secrets) }}
           needs-context: ${{ toJson(needs) }}
           inputs-context: ${{ toJson(inputs) }}
 
@@ -90,7 +89,7 @@ jobs:
 
       - name: 🫂 Combine PRs
         id: combine-prs
-        uses: github/combine-prs@v5.2.0
+        uses: github/combine-prs@2909f404763c3177a456e052bdb7f2e85d3a7cb3 # v5.2.0
         with:
           github_token: ${{ steps.get-token.outputs.token }}
           branch_prefix: ${{ inputs.branch-prefix }}
