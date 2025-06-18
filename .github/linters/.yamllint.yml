@@ -10,5 +10,7 @@ rules:
   line-length: disable
 
 ignore:
-  - .git
-  - node_modules
+  - .git/
+  - node_modules/
+  - dist/
+  - pnpm-lock.yaml

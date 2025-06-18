@@ -19,10 +19,14 @@ MD024: false
 MD025:
   front_matter_title: ""
 
+# Ordered list item prefix
+MD029:
+  style: one
+
 # MD033/no-inline-html - Inline HTML
 MD033:
   # Allowed elements
-  allowed_elements: ["br", "pre"]
+  allowed_elements: ["br", "pre", "details", "summary"]
 
 # MD041/first-line-heading/first-line-h1
 # MD041: false
@@ -30,4 +34,4 @@ MD033:
 # MD046/code-block-style - Code block style
 MD046:
   # Block style
-  style: "fenced"
+  style: fenced
