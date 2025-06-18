@@ -34,7 +34,8 @@
   "workspaceMount": "source=${localWorkspaceFolder},target=${containerWorkspaceFolder},type=bind,consistency=cached",
   "workspaceFolder": "/workspace",
   "remoteEnv": {
-    "LOCAL_WORKSPACE_FOLDER": "${localWorkspaceFolder}"
+    "LOCAL_WORKSPACE_FOLDER": "${localWorkspaceFolder}",
+    "GITHUB_TOKEN": "${localEnv:GITHUB_TOKEN}"
   },
   "remoteUser": "vscode",
   // Configure tool-specific properties.
@@ -79,7 +80,8 @@
         "ms-vscode.vscode-typescript-next",
         "dbaeumer.vscode-eslint",
         "redhat.fabric8-analytics",
-        "pflannery.vscode-versionlens"
+        "pflannery.vscode-versionlens",
+        "bierner.github-markdown-preview"
       ]
     }
   }

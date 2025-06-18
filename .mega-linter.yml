@@ -46,6 +46,9 @@ ENABLE_LINTERS:
 
   # JavaScript
   - JAVASCRIPT_PRETTIER
+
+  # TypeScript
+  - TYPESCRIPT_PRETTIER
 EXCLUDED_DIRECTORIES:
   - ".git"
   - "node_modules"
@@ -53,7 +56,7 @@ EXCLUDED_DIRECTORIES:
   - ".terraform"
   - "dist"
 
-ACTION_ACTIONLINT_CONFIG_FILE: .github/actionlint.yaml
+ACTION_ACTIONLINT_CONFIG_FILE: .github/actionlint.yml
 MARKDOWN_MARKDOWNLINT_CONFIG_FILE: .github/linters/.markdownlint.yml
 YAML_YAMLLINT_CONFIG_FILE: .github/linters/.yamllint.yml
 REPOSITORY_GITLEAKS_CONFIG_FILE: .github/linters/.gitleaks.toml
@@ -61,3 +64,4 @@ SPELL_CSPELL_CONFIG_FILE: .github/linters/.cspell.yml
 SPELL_CSPELL_FILE_EXTENSIONS: [".md"]
 SPELL_LYCHEE_CONFIG_FILE: .github/linters/.lychee.toml
 JAVASCRIPT_PRETTIER_CONFIG_FILE: .github/linters/.prettierrc.yml
+TYPESCRIPT_PRETTIER_CONFIG_FILE: .github/linters/.prettierrc.yml
