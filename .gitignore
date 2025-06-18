@@ -41,6 +41,9 @@ build/Release
 node_modules/
 jspm_packages/
 
+# TypeScript v1 declaration files
+typings/
+
 # Snowpack dependency directory (https://snowpack.dev/)
 web_modules/
 
@@ -52,6 +55,12 @@ web_modules/
 
 # Optional eslint cache
 .eslintcache
+
+# Microbundle cache
+.rpt2_cache/
+.rts2_cache_cjs/
+.rts2_cache_es/
+.rts2_cache_umd/
 
 # Optional stylelint cache
 .stylelintcache
@@ -126,5 +135,24 @@ dist
 .yarn/install-state.gz
 .pnp.*
 
+# OS metadata
+.DS_Store
+Thumbs.db
+
+# Ignore built ts files
+__tests__/runner/*
+
+# IDE files
+.idea
+*.code-workspace
+
 # Custom
 .lycheecache
+*-report.xml
+*-report.md
+*-report.json
+*-report.html
+*_report.xml
+*_report.md
+*_report.json
+*_report.html
