@@ -17,93 +17,139 @@ concurrency:
 env:
   DEBUG: ${{ secrets.ACTIONS_RUNNER_DEBUG || vars.ACTIONS_RUNNER_DEBUG || secrets.ACTIONS_STEP_DEBUG || vars.ACTIONS_STEP_DEBUG || false }}
 
+# Give the default GITHUB_TOKEN write permission to commit and push, comment
+# issues & post new PR; remove the ones you do not need
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+
 jobs:
   linter:
-    name: ✔️ Linter
-    if: ${{ github.event_name == 'push' || (github.event_name == 'pull_request' && !github.event.pull_request.draft && !contains(fromJSON('["closed", "converted_to_draft"]'), github.event.action)) }}
-    runs-on: ${{ inputs.runs-on }}
-    permissions:
-      contents: read
-      pull-requests: read
+    name: Linter
+    runs-on: ubuntu-latest
+
     steps:
-      - name: 🩺 Debug
-        if: ${{ env.DEBUG == 'true' }}
-        uses: raven-actions/debug@13e7c5b2e0436a1b85276087eba43ec7d46bd955 # v1.1.0
-        with:
-          vars-context: ${{ toJson(vars) }}
-          needs-context: ${{ toJson(needs) }}
-          inputs-context: ${{ toJson(inputs) }}
-
-      # - name: 🔑 Get GitHub Token
-      #   uses: actions/create-github-app-token@a0de6af83968303c8c955486bf9739a57d23c7f1 # v1.10.0
-      #   id: get-token
-      #   with:
-      #     app-id: ${{ secrets.ORG_BOT_APP_ID }}
-      #     private-key: ${{ secrets.ORG_BOT_PRIVATE_KEY }}
-      - name: ⤵️ Checkout
+      # Git Checkout
+      - name: Checkout
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
-        # with:
-        #   token: ${{ steps.get-token.outputs.token }}
-
-      - name: 🔁 Detect changes
-        uses: dorny/paths-filter@de90cc6fb38fc0963ad72b210f1f284cd68cea36 # v3.0.2
-        id: changes
         with:
-          # token: ${{ steps.get-token.outputs.token }}
-          list-files: shell
-          filters: |
-            gh-workflows:
-              - '.github/workflows/**'
-            md:
-              - '**/*.md'
-            changed:
-              - '**'
+          token: ${{ github.token }}
 
-      - name: 🚧 Setup Python
-        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
-        with:
-          python-version: 3.12
+          # If you use VALIDATE_ALL_CODEBASE = true, you can remove this line to
+          # improve performance
+          fetch-depth: 0
 
-      - name: 🚧 Install pre-commit
-        run: python3 -m pip install --upgrade pre-commit
+      # MegaLinter
+      - name: Run MegaLinter
 
-      - name: 🚅 Cache pre-commit
-        uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4.2.3
-        with:
-          path: ~/.cache/pre-commit
-          key: pre-commit-3|${{ env.pythonLocation }}|${{ hashFiles('.pre-commit-config.yaml') }}
+        # You can override MegaLinter flavor used to have faster performances
+        # More info at https://megalinter.io/latest/flavors/
+        uses: oxsecurity/megalinter/flavors/cupcake@e08c2b05e3dbc40af4c23f41172ef1e068a7d651 # v8.8.0
+        id: ml
 
-      - name: ✔️ Run pre-commit
-        run: pre-commit run --show-diff-on-failure --color always ${{ (github.event_name == 'pull_request' && format('--files {0}', steps.changes.outputs.changed_files)) || '--all-files' }}
+        # All available variables are described in documentation
+        # https://megalinter.io/latest/configuration/
         env:
-          SKIP: ${{ (github.event_name == 'push' && 'no-commit-to-branch,pre-commit-autoupdate') || 'pre-commit-autoupdate' }}
+          # Validates all source when push on main, else just the git diff with
+          # main. Override with true if you always want to lint all sources
+          #
+          # To validate the entire codebase, set to:
+          # VALIDATE_ALL_CODEBASE: true
+          #
+          # To validate only diff with main, set to:
+          # VALIDATE_ALL_CODEBASE: >-
+          #   ${{
+          #     github.event_name == 'push' &&
+          #     contains(fromJSON('["refs/heads/main", "refs/heads/master"]'), github.ref)
+          #   }}
+          VALIDATE_ALL_CODEBASE: >-
+            ${{
+              github.event_name == 'push' &&
+              contains(fromJSON('["refs/heads/main", "refs/heads/master"]'), github.ref)
+            }}
 
-      - name: ✔️ Run actionlint
-        if: ${{ steps.changes.outputs.gh-workflows == 'true' }}
-        uses: raven-actions/actionlint@3a24062651993d40fed1019b58ac6fbdfbf276cc # v2.0.1
+          GITHUB_TOKEN: ${{ github.token }}
+
+          # ADD YOUR CUSTOM ENV VARIABLES HERE OR DEFINE THEM IN A FILE
+          # .mega-linter.yml AT THE ROOT OF YOUR REPOSITORY
+
+          # Uncomment to disable copy-paste and spell checks
+          # DISABLE: COPYPASTE,SPELL
+
+      # Upload MegaLinter artifacts
+      - name: Archive production artifacts
+        if: success() || failure()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
-          flags: "-ignore SC2086 -ignore action"
+          name: MegaLinter reports
+          include-hidden-files: "true"
+          path: |
+            megalinter-reports
+            mega-linter.log
 
-      - name: ⚙️ Get config (lychee)
-        if: ${{ steps.changes.outputs.md == 'true' }}
+      # Set APPLY_FIXES_IF var for use in future steps
+      - name: Set APPLY_FIXES_IF var
         run: |
-          mkdir -p $(dirname "${CONFIG_FILE}")
-          gh api -H "Accept: application/vnd.github.raw" "/repos/${REPO_OWNER}/.workflows/contents/${CONFIG_FILE}" > "${CONFIG_FILE}"
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
-          REPO_OWNER: ${{ github.repository_owner }}
-          CONFIG_FILE: .github/linters/.lychee.toml
+          printf 'APPLY_FIXES_IF=%s\n' "${{
+            steps.ml.outputs.has_updated_sources == 1 &&
+            (
+              env.APPLY_FIXES_EVENT == 'all' ||
+              env.APPLY_FIXES_EVENT == github.event_name
+            ) &&
+            (
+              github.event_name == 'push' ||
+              github.event.pull_request.head.repo.full_name == github.repository
+            )
+          }}" >> "${GITHUB_ENV}"
 
-      - name: 🌐 Run lychee (markdown links)
-        if: ${{ steps.changes.outputs.md == 'true' }}
-        uses: lycheeverse/lychee-action@82202e5e9c2f4ef1a55a3d02563e1cb6041e5332 # v2.4.1
+      # Set APPLY_FIXES_IF_* vars for use in future steps
+      - name: Set APPLY_FIXES_IF_* vars
+        run: |
+          printf 'APPLY_FIXES_IF_PR=%s\n' "${{
+            env.APPLY_FIXES_IF == 'true' &&
+            env.APPLY_FIXES_MODE == 'pull_request'
+          }}" >> "${GITHUB_ENV}"
+          printf 'APPLY_FIXES_IF_COMMIT=%s\n' "${{
+            env.APPLY_FIXES_IF == 'true' &&
+            env.APPLY_FIXES_MODE == 'commit' &&
+            (!contains(fromJSON('["refs/heads/main", "refs/heads/master"]'), github.ref))
+          }}" >> "${GITHUB_ENV}"
+
+      # Create pull request if applicable
+      # (for now works only on PR from same repository, not from forks)
+      - name: Create Pull Request with applied fixes
+        uses: peter-evans/create-pull-request@271a8d0340265f705b14b6d32b9829c1cb33d45e # v7.0.8
+        id: cpr
+        if: env.APPLY_FIXES_IF_PR == 'true'
         with:
-          args: --config ".github/linters/.lychee.toml" --no-progress ${{ steps.changes.outputs.md_files }}
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
+          token: ${{ github.token }}
+          commit-message: "style: linters automatic fixes"
+          title: "style: linters automatic fixes"
+          # labels: bot
 
-      # - name: 🌐 Markdown Links
-      #   if: ${{ steps.changes.outputs.md == 'true' }}
-      #   uses: gaurav-nelson/github-action-markdown-link-check@v1
-      #   with:
-      #     config-file: .github/linters/.markdown-link-check.json
+      - name: Create PR output
+        if: env.APPLY_FIXES_IF_PR == 'true'
+        run: |
+          echo "PR Number - ${{ steps.cpr.outputs.pull-request-number }}"
+          echo "PR URL - ${{ steps.cpr.outputs.pull-request-url }}"
+
+      # Push new commit if applicable
+      # (for now works only on PR from same repository, not from forks)
+      - name: Prepare commit
+        if: env.APPLY_FIXES_IF_COMMIT == 'true'
+        run: sudo chown -Rc $UID .git/
+
+      - name: Commit and push applied linter fixes
+        uses: stefanzweifel/git-auto-commit-action@778341af668090896ca464160c2def5d1d1a3eb0 # v6.0.1
+        if: env.APPLY_FIXES_IF_COMMIT == 'true'
+        with:
+          branch: >-
+            ${{
+              github.event.pull_request.head.ref ||
+              github.head_ref ||
+              github.ref
+            }}
+          commit_message: "style: linters automatic fixes"
+          commit_user_name: megalinter-bot
+          commit_user_email: 129584137+megalinter-bot@users.noreply.github.com
