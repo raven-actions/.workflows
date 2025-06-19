@@ -1,0 +1,71 @@
+---
+name: Sync
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - .github/workflows/sync.yml
+      - sync.yml
+      - sync/**
+  workflow_dispatch:
+    inputs:
+      debug:
+        description: Debug mode
+        type: boolean
+        required: false
+        default: false
+
+# Allow one concurrent
+concurrency:
+  group: ${{ format('{0}-{1}-{2}-{3}-{4}', github.workflow, github.event_name, github.ref, github.base_ref, github.head_ref) }}
+  cancel-in-progress: true
+
+env:
+  DEBUG: ${{ inputs.debug || secrets.ACTIONS_RUNNER_DEBUG || vars.ACTIONS_RUNNER_DEBUG || secrets.ACTIONS_STEP_DEBUG || vars.ACTIONS_STEP_DEBUG || false }}
+
+jobs:
+  sync:
+    name: Sync
+    runs-on: ubuntu-latest
+    steps:
+      - name: Debug
+        uses: raven-actions/debug@13e7c5b2e0436a1b85276087eba43ec7d46bd955 # v1.1.0
+        with:
+          vars-context: ${{ toJson(vars) }}
+          secrets-context: ${{ toJson(secrets) }}
+          needs-context: ${{ toJson(needs) }}
+          inputs-context: ${{ toJson(inputs) }}
+
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - name: Get App Token
+        uses: actions/create-github-app-token@df432ceedc7162793a195dd1713ff69aefc7379e # v2.0.6
+        id: get-token
+        with:
+          app-id: ${{ secrets.SYNC_BOT_APP_ID }}
+          private-key: ${{ secrets.SYNC_BOT_PRIVATE_KEY }}
+          owner: ${{ github.repository_owner }}
+          repositories: |
+            .workflows
+            publish-and-tag
+            bot-details
+
+      - name: Get bot details
+        id: bot-details
+        uses: raven-actions/bot-details@b2d5fd6eb98adc0cb67df864daa834849f3a8bc0 #v1.1.0
+        with:
+          bot-slug-name: ${{ steps.get-token.outputs.app-slug }}
+          set-env: false
+
+        # Use specific commit SHA because the PR is not merged yet (https://github.com/BetaHuhn/repo-file-sync-action/pull/303)
+      - name: Run Repo File Sync
+        uses: BetaHuhn/repo-file-sync-action@2da9fa866f117b06abec3e4c61c5e96ef86c142f
+        with:
+          GH_INSTALLATION_TOKEN: ${{ steps.get-token.outputs.token }}
+          CONFIG_PATH: sync.yml
+          COMMIT_PREFIX: "chore:"
+          GIT_EMAIL: ${{ steps.bot-details.outputs.email }}
+          GIT_USERNAME: ${{ steps.bot-details.outputs.name }}
