@@ -14,15 +14,9 @@ group:
     - source: sync/.devcontainer/
       dest: .devcontainer/
       deleteOrphaned: true
-    - source: sync/.github/linters/
-      dest: .github/linters/
+    - source: sync/.github/
+      dest: .github/
       deleteOrphaned: true
-    - source: sync/.github/workflows/linter.yml
-      dest: .github/workflows/linter.yml
-    - source: sync/.github/dependabot.yml
-      dest: .github/dependabot.yml
-    - source: sync/.github/FUNDING.yml
-      dest: .github/FUNDING.yml
     - source: sync/.taskfiles/
       dest: .taskfiles/
       deleteOrphaned: true

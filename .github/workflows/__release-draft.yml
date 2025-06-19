@@ -93,7 +93,7 @@ jobs:
         if: ${{ runner.os != 'Windows' }}
         run: |
           echo "${RELEASE_URL}"
-          echo "${RELEASE_URL}" >> $GITHUB_STEP_SUMMARY
+          echo "${RELEASE_URL}" >> "$GITHUB_STEP_SUMMARY"
         shell: bash
         env:
           RELEASE_URL: ${{ steps.release-drafter.outputs.html_url }}
