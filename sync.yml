@@ -4,45 +4,49 @@
 group:
   repos: |
     raven-actions/.workflows
-    raven-actions/publish-and-tag
+    raven-actions/actionlint
     raven-actions/bot-details
+    raven-actions/debug
+    raven-actions/environment-variables
+    raven-actions/get-repos
+    raven-actions/publish-and-tag
   files:
-    - source: sync/LICENSE.MIT.njk
-      dest: LICENSE
-      template:
-        name: Raven Actions, Dariusz Porowski
-        year: 2025
+    - source: sync/.devcontainer/
+      dest: .devcontainer/
+      deleteOrphaned: true
     - source: sync/.github/linters/
       dest: .github/linters/
+      deleteOrphaned: true
+    - source: sync/.github/workflows/linter.yml
+      dest: .github/workflows/linter.yml
+    - source: sync/.github/dependabot.yml
+      dest: .github/dependabot.yml
+    - source: sync/.github/FUNDING.yml
+      dest: .github/FUNDING.yml
+    - source: sync/.taskfiles/
+      dest: .taskfiles/
+      deleteOrphaned: true
+    - source: sync/.vscode/
+      dest: .vscode/
       deleteOrphaned: true
     - source: sync/.editorconfig
       dest: .editorconfig
     - source: sync/.gitattributes
       dest: .gitattributes
+    - source: sync/.gitignore
+      dest: .gitignore
     - source: sync/.lycheeignore
       dest: .lycheeignore
     - source: sync/.mega-linter.yml
       dest: .mega-linter.yml
-    - source: sync/.vscode/
-      dest: .vscode/
-      deleteOrphaned: true
-    - source: sync/.github/dependabot.yml
-      dest: .github/dependabot.yml
-    - source: sync/.taskfiles/
-      dest: .taskfiles/
-      deleteOrphaned: true
-    - source: sync/Taskfile.yml
-      dest: Taskfile.yml
-    - source: sync/.gitignore
-      dest: .gitignore
-    - source: sync/.github/workflows/linter.yml
-      dest: .github/workflows/linter.yml
-    - source: sync/.devcontainer/
-      dest: .devcontainer/
-      deleteOrphaned: true
-    - source: sync/.github/FUNDING.yml
-      dest: .github/FUNDING.yml
-    - source: sync/.prettierignore
-      dest: .prettierignore
     - source: sync/.node-version
       dest: .node-version
+    - source: sync/.prettierignore
+      dest: .prettierignore
+    - source: sync/LICENSE.MIT.njk
+      dest: LICENSE
+      template:
+        name: Raven Actions, Dariusz Porowski
+        year: 2025
+    - source: sync/Taskfile.yml
+      dest: Taskfile.yml

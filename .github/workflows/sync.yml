@@ -34,7 +34,6 @@ jobs:
         uses: raven-actions/debug@13e7c5b2e0436a1b85276087eba43ec7d46bd955 # v1.1.0
         with:
           vars-context: ${{ toJson(vars) }}
-          secrets-context: ${{ toJson(secrets) }}
           needs-context: ${{ toJson(needs) }}
           inputs-context: ${{ toJson(inputs) }}
 
@@ -50,8 +49,12 @@ jobs:
           owner: ${{ github.repository_owner }}
           repositories: |
             .workflows
-            publish-and-tag
+            actionlint
             bot-details
+            debug
+            environment-variables
+            get-repos
+            publish-and-tag
 
       - name: Get bot details
         id: bot-details
