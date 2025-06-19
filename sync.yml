@@ -10,13 +10,30 @@ group:
     raven-actions/environment-variables
     raven-actions/get-repos
     raven-actions/publish-and-tag
+
   files:
     - source: sync/.devcontainer/
       dest: .devcontainer/
       deleteOrphaned: true
-    - source: sync/.github/
-      dest: .github/
+    - source: sync/.github/linters/
+      dest: .github/linters/
       deleteOrphaned: true
+    - source: sync/.github/workflows/linter.yml
+      dest: .github/workflows/linter.yml
+    - source: sync/.github/CODE_OF_CONDUCT.md
+      dest: .github/CODE_OF_CONDUCT.md
+    - source: sync/.github/CODEOWNERS
+      dest: .github/CODEOWNERS
+    - source: sync/.github/CONTRIBUTING.md
+      dest: .github/CONTRIBUTING.md
+    - source: sync/.github/dependabot.yml
+      dest: .github/dependabot.yml
+    - source: sync/.github/FUNDING.yml
+      dest: .github/FUNDING.yml
+    - source: sync/.github/PULL_REQUEST_TEMPLATE.md
+      dest: .github/PULL_REQUEST_TEMPLATE.md
+    - source: sync/.github/SECURITY.md
+      dest: .github/SECURITY.md
     - source: sync/.taskfiles/
       dest: .taskfiles/
       deleteOrphaned: true
