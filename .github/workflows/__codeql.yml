@@ -64,19 +64,19 @@ jobs:
           inputs-context: ${{ toJson(inputs) }}
 
       - name: 🔑 Get GitHub Token
-        uses: actions/create-github-app-token@df432ceedc7162793a195dd1713ff69aefc7379e # v2.0.6
+        uses: actions/create-github-app-token@0f859bf9e69e887678d5bbfbee594437cb440ffe # v2.1.0
         id: get-token
         with:
           app-id: ${{ secrets.ORG_BOT_APP_ID }}
           private-key: ${{ secrets.ORG_BOT_PRIVATE_KEY }}
 
       - name: ⤵️ Checkout
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
         with:
           token: ${{ steps.get-token.outputs.token }}
 
       - name: 🚧 Initialize CodeQL
-        uses: github/codeql-action/init@181d5eefc20863364f96762470ba6f862bdef56b # v3.29.2
+        uses: github/codeql-action/init@76621b61decf072c1cee8dd1ce2d2a82d33c17ed # v3.29.8
         with:
           config-file: ${{ (inputs.config-file != '' && inputs.config-file) || '' }}
           languages: ${{ matrix.language }}
@@ -94,7 +94,7 @@ jobs:
       # If this step fails, then you should remove it and run the build manually (see below)
       - name: 🏗️ Auto build
         if: ${{ !inputs.build-command }}
-        uses: github/codeql-action/autobuild@181d5eefc20863364f96762470ba6f862bdef56b # v3.29.2
+        uses: github/codeql-action/autobuild@76621b61decf072c1cee8dd1ce2d2a82d33c17ed # v3.29.8
         with:
           token: ${{ steps.get-token.outputs.token }}
 
@@ -116,7 +116,7 @@ jobs:
       #     ./location_of_script_within_repo/buildscript.sh
 
       - name: 🩺 Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@181d5eefc20863364f96762470ba6f862bdef56b # v3.29.2
+        uses: github/codeql-action/analyze@76621b61decf072c1cee8dd1ce2d2a82d33c17ed # v3.29.8
         with:
           category: "/language:${{matrix.language}}"
           upload: false
