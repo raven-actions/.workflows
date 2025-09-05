@@ -45,7 +45,7 @@ jobs:
     steps:
       - name: 🩺 Debug
         if: ${{ env.DEBUG == 'true' }}
-        uses: raven-actions/debug@13e7c5b2e0436a1b85276087eba43ec7d46bd955 # v1.1.0
+        uses: raven-actions/debug@9dbdeb7eea607a7d73411895c65987e71d59a466 # v1.2.0
         with:
           vars-context: ${{ toJson(vars) }}
           needs-context: ${{ toJson(needs) }}
@@ -80,7 +80,7 @@ jobs:
 
       - name: 🥇 Update the major tag to include the ${{ inputs.tag-name }} changes
         id: major-tag
-        uses: actions/publish-action@f784495ce78a41bac4ed7e34a73f0034015764bb # v0.3.0
+        uses: actions/publish-action@23f4c6f12633a2da8f44938b71fde9afec138fb4 # v0.4.0
         with:
           source-tag: ${{ inputs.tag-name }}
           token: ${{ steps.get-token.outputs.token }}
