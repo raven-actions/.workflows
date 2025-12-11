@@ -118,6 +118,9 @@
     "./.github/linters/.cspell.yml"
   ],
   "prettier.configPath": "./.github/linters/.prettierrc.yml",
+  "eslint.options": {
+    "overrideConfigFile": "./.github/linters/eslint.config.mjs"
+  },
   "linter.linters": {
     "yamllint": {
       "configFiles": [
