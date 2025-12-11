@@ -5,8 +5,17 @@ import globals from 'globals'
 import prettier from 'eslint-config-prettier'
 
 export default defineConfig(
+  // Global ignores - must be first
+  {
+    ignores: ['dist/**', 'node_modules/**', 'coverage/**', '.dev/**', 'tests/fixtures/**', '**/*.js', '**/*.mjs', '**/*.cjs', '*.config.ts', '*.config.mjs']
+  },
+
+  // Base configs
   js.configs.recommended,
   tseslint.configs.recommended,
+  tseslint.configs.stylistic,
+
+  // Main config for TypeScript files
   {
     languageOptions: {
       ecmaVersion: 2022,
@@ -16,45 +25,23 @@ export default defineConfig(
         ...globals.es2022
       },
       parserOptions: {
+        projectService: true,
         tsconfigRootDir: import.meta.dirname + '/../..'
       }
     },
     rules: {
-      // Possible Errors
+      // Stricter than recommended
       'no-cond-assign': ['error', 'always'],
-      'no-constant-condition': 'error',
-      'no-dupe-args': 'error',
-      'no-dupe-keys': 'error',
-      'no-duplicate-case': 'error',
-      'no-empty-character-class': 'error',
-      'no-extra-boolean-cast': 'error',
-      'no-func-assign': 'error',
-      'no-invalid-regexp': 'error',
-      'no-irregular-whitespace': 'error',
-      'no-unsafe-negation': 'error',
-      'no-obj-calls': 'error',
-      'no-unreachable': 'error',
-      'no-dupe-else-if': 'error',
-      'use-isnan': 'error',
-      'valid-typeof': 'error',
-      'no-unexpected-multiline': 'error',
-
-      // Best Practices
       eqeqeq: ['error', 'always', { null: 'ignore' }],
-      'no-implicit-coercion': [
-        'error',
-        {
-          allow: ['-', '- -']
-        }
-      ],
-      'no-implied-eval': 'error',
+      'no-implicit-coercion': ['error', { allow: ['!!'] }],
+      'no-empty': ['error', { allowEmptyCatch: true }],
+
+      // Best practices not in recommended
       'no-lone-blocks': 'error',
       'no-multi-str': 'error',
-      'no-global-assign': 'error',
       'no-new-func': 'error',
       'no-new-wrappers': 'error',
       'no-proto': 'error',
-      'no-redeclare': 'off', // Handled by TypeScript
       'no-script-url': 'error',
       'no-self-compare': 'error',
       'no-sequences': 'error',
@@ -63,60 +50,49 @@ export default defineConfig(
       'no-caller': 'error',
       'no-eval': 'error',
       'no-extend-native': 'error',
-      'no-fallthrough': 'error',
-      'no-octal': 'error',
+      'no-implied-eval': 'error',
       'no-constructor-return': 'error',
+      'no-labels': 'error',
 
-      // Variables
-      'no-delete-var': 'error',
-      'no-undef': 'off', // Handled by TypeScript
-      'no-unused-vars': 'off', // Handled by @typescript-eslint/no-unused-vars
-      '@typescript-eslint/no-unused-vars': ['error', { varsIgnorePattern: '^_', argsIgnorePattern: '^_' }],
-      'no-undef-init': 'error',
-
-      // Non-formatting stylistic rules (won't conflict with Prettier)
-      'no-array-constructor': 'error',
+      // Stylistic (non-formatting, Prettier compatible)
       'no-lonely-if': 'error',
       camelcase: ['error', { properties: 'never' }],
-      'no-multiple-empty-lines': 'error',
       'no-nested-ternary': 'error',
       'one-var': ['error', 'never'],
       'no-unneeded-ternary': 'error',
-      'no-new-object': 'error',
       'default-case-last': 'error',
       'grouped-accessor-pairs': ['error', 'getBeforeSet'],
 
-      // ES6
-      'constructor-super': 'error',
-      'no-class-assign': 'error',
-      'no-const-assign': 'error',
-      'no-this-before-super': 'error',
-      'prefer-const': 'error',
-      'no-var': 'error',
+      // ES6+ preferences
+      'prefer-template': 'error',
+      'prefer-rest-params': 'error',
+      'prefer-spread': 'error',
 
-      // Node.js
-      'no-new-require': 'error',
-      'no-path-concat': 'error',
-
-      // Other
-      'no-empty': ['error', { allowEmptyCatch: true }],
-      'no-labels': 'error',
-      'no-useless-catch': 'error',
-      'no-misleading-character-class': 'error',
-      'no-async-promise-executor': 'error',
-      'no-compare-neg-zero': 'error',
-      'getter-return': 'error',
+      // TypeScript - disable base rules handled by TS
+      'no-redeclare': 'off',
+      'no-undef': 'off',
+      'no-unused-vars': 'off',
+      'no-array-constructor': 'off',
 
       // TypeScript specific
+      '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],
       '@typescript-eslint/no-explicit-any': 'warn',
-      '@typescript-eslint/explicit-function-return-type': 'off',
-      '@typescript-eslint/no-non-null-assertion': 'off',
-      '@typescript-eslint/no-require-imports': 'off'
+      '@typescript-eslint/no-non-null-assertion': 'warn',
+      '@typescript-eslint/array-type': ['error', { default: 'array-simple' }],
+      '@typescript-eslint/prefer-for-of': 'warn',
+      '@typescript-eslint/prefer-function-type': 'warn'
     }
   },
-  // Prettier config must be last to override formatting rules
-  prettier,
+
+  // Test files - relaxed rules
   {
-    ignores: ['dist/**', 'node_modules/**', '*.js', '*.cjs', '*.mjs']
-  }
+    files: ['**/*.test.ts', '**/*.spec.ts', '**/setup.ts', 'tests/**/*.ts'],
+    rules: {
+      '@typescript-eslint/no-explicit-any': 'off',
+      '@typescript-eslint/no-non-null-assertion': 'off'
+    }
+  },
+
+  // Prettier must be last to disable conflicting rules
+  prettier
 )
