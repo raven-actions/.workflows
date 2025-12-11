@@ -12,7 +12,7 @@ on:
         description: The type of runner to use
         required: false
         type: string
-        default: ubuntu-latest
+        default: ubuntu-24.04
 
     outputs:
       id:
@@ -28,6 +28,8 @@ on:
         description: "The major version tag that has been updated (created). Examples: v1, 1"
         value: ${{ jobs.gh-release.outputs.major-tag }}
 
+permissions: {}
+
 env:
   DEBUG: ${{ secrets.ACTIONS_RUNNER_DEBUG || vars.ACTIONS_RUNNER_DEBUG || secrets.ACTIONS_STEP_DEBUG || vars.ACTIONS_STEP_DEBUG || false }}
 
@@ -39,8 +41,9 @@ jobs:
       url: ${{ steps.gh-release.outputs.url }}
       upload_url: ${{ steps.gh-release.outputs.upload_url }}
       major_tag: ${{ steps.major-tag.outputs.major-tag }}
-    # permissions:
-    #   contents: write
+    permissions:
+      contents: write
+    timeout-minutes: 15
     runs-on: ${{ inputs.runs-on }}
     steps:
       - name: 🩺 Debug
@@ -57,6 +60,7 @@ jobs:
         with:
           app-id: ${{ secrets.ORG_BOT_APP_ID }}
           private-key: ${{ secrets.ORG_BOT_PRIVATE_KEY }}
+          permission-contents: write
 
       # - name: 🥇 Update release to the latest
       #   id: gh-release

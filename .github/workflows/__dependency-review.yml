@@ -8,7 +8,9 @@ on:
         description: The type of runner to use
         required: false
         type: string
-        default: ubuntu-latest
+        default: ubuntu-24.04
+
+permissions: {}
 
 concurrency:
   group: ${{ format('{0}-{1}-{2}-{3}-{4}', github.workflow, github.event_name, github.ref, github.base_ref, github.head_ref) }}
@@ -17,15 +19,15 @@ concurrency:
 env:
   DEBUG: ${{ secrets.ACTIONS_RUNNER_DEBUG || vars.ACTIONS_RUNNER_DEBUG || secrets.ACTIONS_STEP_DEBUG || vars.ACTIONS_STEP_DEBUG || false }}
 
-permissions:
-  contents: read
-  pull-requests: write
-
 jobs:
   dependency-review:
     name: 🔀 Dependency Review
     if: ${{ github.repository_visibility == 'public' && (github.event_name == 'pull_request' && !github.event.pull_request.draft && !contains(fromJSON('["closed", "converted_to_draft"]'), github.event.action)) }}
     runs-on: ${{ inputs.runs-on }}
+    permissions:
+      contents: read
+      pull-requests: write
+    timeout-minutes: 15
     steps:
       - name: 🩺 Debug
         if: ${{ env.DEBUG == 'true' }}
@@ -35,22 +37,16 @@ jobs:
           needs-context: ${{ toJson(needs) }}
           inputs-context: ${{ toJson(inputs) }}
 
-      - name: 🔑 Get GitHub Token
-        uses: actions/create-github-app-token@29824e69f54612133e76f7eaac726eef6c875baf # v2.2.1
-        id: get-token
-        with:
-          app-id: ${{ secrets.ORG_BOT_APP_ID }}
-          private-key: ${{ secrets.ORG_BOT_PRIVATE_KEY }}
-
       - name: ⤵️ Checkout
         uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
         with:
-          token: ${{ steps.get-token.outputs.token }}
+          token: ${{ github.token }}
+          persist-credentials: false
 
       - name: 🔀 Dependency Review
         uses: actions/dependency-review-action@3c4e3dcb1aa7874d2c16be7d79418e9b7efd6261 # v4.8.2
         with:
-          repo-token: ${{ steps.get-token.outputs.token }}
+          repo-token: ${{ github.token }}
           vulnerability-check: true
           license-check: true
           comment-summary-in-pr: true

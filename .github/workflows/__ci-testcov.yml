@@ -8,6 +8,8 @@ on:
         description: Debug mode
         required: false
 
+permissions: {}
+
 # Allow one concurrent
 concurrency:
   group: ${{ format('{0}-{1}-{2}-{3}-{4}', github.workflow, github.event_name, github.ref, github.base_ref, github.head_ref) }}
@@ -20,18 +22,17 @@ jobs:
   build-test:
     name: 🏗️🧪 Build and Test
     if: ${{ contains(fromJSON('["push", "workflow_dispatch"]'), github.event_name) || (github.event_name == 'pull_request' && !github.event.pull_request.draft) }}
-    # permissions:
-    #   contents: read
-    #   issues: write
-    #   pull-requests: write
-    #   checks: write
-    #   actions: write
-    #   id-token: write
+    permissions:
+      contents: read
+      pull-requests: write
+      checks: write
+      id-token: write
+    timeout-minutes: 15
     strategy:
       fail-fast: false
       matrix:
         os:
-          - ubuntu-latest
+          - ubuntu-24.04
           - macos-latest
           - windows-latest
     runs-on: ${{ matrix.os }}
@@ -44,36 +45,35 @@ jobs:
           needs-context: ${{ toJson(needs) }}
           inputs-context: ${{ toJson(inputs) }}
 
-      - name: 🔑 Get Token
-        uses: actions/create-github-app-token@29824e69f54612133e76f7eaac726eef6c875baf # v2.2.1
-        id: get-token
-        with:
-          app-id: ${{ secrets.ORG_BOT_APP_ID }}
-          private-key: ${{ secrets.ORG_BOT_PRIVATE_KEY }}
-
       - name: ⤵️ Checkout
         uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
         with:
-          token: ${{ steps.get-token.outputs.token }}
+          token: ${{ github.token }}
           fetch-depth: 0
+          persist-credentials: false
 
       - name: 🔄️ Detect changes
         uses: dorny/paths-filter@de90cc6fb38fc0963ad72b210f1f284cd68cea36 # v3.0.2
         id: changes
         with:
-          token: ${{ steps.get-token.outputs.token }}
+          token: ${{ github.token }}
           filters: |
             app:
-              - 'src/**'
-              - 'tests/**'
-              - 'package.json'
-              - 'package-lock.json'
-              - 'pnpm-lock.yaml'
-              - '.node-version'
-              - 'jest.config.js'
-              - 'tsconfig.json'
-              - 'action.yml'
-              - 'codecov.yml'
+              - src/**
+              - tests/**
+              - package.json
+              - package-lock.json
+              - pnpm-lock.yaml
+              - .node-version
+              - jest.config.js
+              - jest.config.*js
+              - vitest.config.js
+              - vitest.config.*js
+              - tsconfig.json
+              - action.yml
+              - action.yaml
+              - codecov.yml
+              - codecov.yaml
 
       - name: 🚧 Setup pnpm
         if: ${{ steps.changes.outputs.app == 'true' }}
@@ -103,7 +103,7 @@ jobs:
         continue-on-error: true
 
       - name: 📤 Upload test results
-        if: ${{ steps.changes.outputs.app == 'true' && matrix.os == 'ubuntu-latest' }}
+        if: ${{ steps.changes.outputs.app == 'true' && matrix.os == 'ubuntu-24.04' }}
         uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
         with:
           name: test-results
@@ -111,7 +111,7 @@ jobs:
           if-no-files-found: warn
 
       - name: 📤 Upload coverage results
-        if: ${{ steps.changes.outputs.app == 'true' && matrix.os == 'ubuntu-latest' }}
+        if: ${{ steps.changes.outputs.app == 'true' && matrix.os == 'ubuntu-24.04' }}
         uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
         with:
           name: coverage-results
@@ -119,26 +119,26 @@ jobs:
           if-no-files-found: warn
 
       - name: 📜 Test report
-        if: ${{ steps.changes.outputs.app == 'true' && matrix.os == 'ubuntu-latest' }}
+        if: ${{ steps.changes.outputs.app == 'true' && matrix.os == 'ubuntu-24.04' }}
         # uses: phoenix-actions/test-reporting@f957cd93fc2d848d556fa0d03c57bc79127b6b5e # v15
         uses: dorny/test-reporter@fe45e9537387dac839af0d33ba56eed8e24189e8 # v2.3.0
         with:
-          token: ${{ steps.get-token.outputs.token }}
+          token: ${{ github.token }}
           name: 📜 Test report
           path: reports/junit.xml
           reporter: jest-junit
           use-actions-summary: true
 
       - name: 📜 Test Coverage Report
-        if: ${{ steps.changes.outputs.app == 'true' && matrix.os == 'ubuntu-latest' }}
+        if: ${{ steps.changes.outputs.app == 'true' && matrix.os == 'ubuntu-24.04' }}
         uses: codecov/codecov-action@671740ac38dd9b0130fbe1cec585b89eea48d3de # v5.5.2
         with:
           use_oidc: true
           files: coverage/cobertura-coverage.xml
           report_type: coverage
 
-      - name: 📜 Test Result Report
-        if: ${{ steps.changes.outputs.app == 'true' && matrix.os == 'ubuntu-latest' }}
+      - name: 📜 Test Results Report
+        if: ${{ steps.changes.outputs.app == 'true' && matrix.os == 'ubuntu-24.04' }}
         uses: codecov/codecov-action@671740ac38dd9b0130fbe1cec585b89eea48d3de # v5.5.2
         with:
           use_oidc: true

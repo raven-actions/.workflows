@@ -13,7 +13,7 @@ on:
         description: The type of runner to use
         required: false
         type: string
-        default: ubuntu-latest
+        default: ubuntu-24.04
 
     outputs:
       id:
@@ -32,6 +32,8 @@ on:
         description: The URL for uploading assets to the release
         value: ${{ jobs.draft-release.outputs.upload_url }}
 
+permissions: {}
+
 env:
   DEBUG: ${{ secrets.ACTIONS_RUNNER_DEBUG || vars.ACTIONS_RUNNER_DEBUG || secrets.ACTIONS_STEP_DEBUG || vars.ACTIONS_STEP_DEBUG || false }}
 
@@ -44,9 +46,10 @@ jobs:
       tag_name: ${{ steps.release-drafter.outputs.tag_name }}
       html_url: ${{ steps.release-drafter.outputs.html_url }}
       upload_url: ${{ steps.release-drafter.outputs.upload_url }}
-    # permissions:
-    #   contents: write
-    #   pull-requests: read
+    permissions:
+      contents: write
+      pull-requests: read
+    timeout-minutes: 15
     runs-on: ${{ inputs.runs-on }}
     steps:
       - name: 🩺 Debug
@@ -57,17 +60,10 @@ jobs:
           needs-context: ${{ toJson(needs) }}
           inputs-context: ${{ toJson(inputs) }}
 
-      - name: 🔑 Get Token
-        uses: actions/create-github-app-token@29824e69f54612133e76f7eaac726eef6c875baf # v2.2.1
-        id: get-token
-        with:
-          app-id: ${{ secrets.ORG_BOT_APP_ID }}
-          private-key: ${{ secrets.ORG_BOT_PRIVATE_KEY }}
-
       #       - name: ⤵️ Checkout
       #         uses: actions/checkout@v3
       #         with:
-      #           token: ${{ steps.get-token.outputs.token }}
+      #           token: ${{ github.token }}
 
       #       - name: ⚙️ Get config (release drafter)
       #         run: |
@@ -76,7 +72,7 @@ jobs:
       #           gh api -H "Accept: application/vnd.github+json" "/repos/${REPO_OWNER}/.workflows/contents/${CONFIG_FILE}" --jq .content | base64 --decode > "${CONFIG_FILE}"
       #           tree -a
       #         env:
-      #           GITHUB_TOKEN: ${{ steps.get-token.outputs.token }}
+      #           GITHUB_TOKEN: ${{ github.token }}
       #           REPO_OWNER: ${{ github.repository_owner }}
       #           CONFIG_FILE: .github/configs/release-drafter.yml
 
@@ -87,7 +83,7 @@ jobs:
           config-name: configs/release-drafter.yml
           prerelease: ${{ inputs.prerelease }}
         env:
-          GITHUB_TOKEN: ${{ steps.get-token.outputs.token }}
+          GITHUB_TOKEN: ${{ github.token }}
 
       - name: ✍️ Set Release URL in the Summary
         if: ${{ runner.os != 'Windows' }}

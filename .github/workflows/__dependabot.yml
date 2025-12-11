@@ -8,7 +8,9 @@ on:
         description: The type of runner to use
         required: false
         type: string
-        default: ubuntu-latest
+        default: ubuntu-24.04
+
+permissions: {}
 
 concurrency:
   group: ${{ format('{0}-{1}-{2}-{3}-{4}', github.workflow, github.event_name, github.ref, github.base_ref, github.head_ref) }}
@@ -23,8 +25,10 @@ jobs:
     if: ${{ (github.event.pull_request_target.user.login == 'dependabot[bot]' || github.event.pull_request.user.login == 'dependabot[bot]' || github.actor == 'dependabot[bot]') && (github.event_name == 'pull_request' || github.event_name == 'pull_request_target') }}
     name: 🤖 Dependabot
     runs-on: ${{ inputs.runs-on }}
-    # permissions:
-    #   pull-requests: read
+    permissions:
+      contents: read
+      pull-requests: read
+    timeout-minutes: 15
     steps:
       - name: 🩺 Debug
         if: ${{ env.DEBUG == 'true' }}
@@ -40,6 +44,8 @@ jobs:
         with:
           app-id: ${{ secrets.ORG_BOT_APP_ID }}
           private-key: ${{ secrets.ORG_BOT_PRIVATE_KEY }}
+          permission-contents: write
+          permission-pull-requests: write
 
       - name: 📝 Fetch Dependabot metadata
         id: dependabot-metadata
@@ -51,18 +57,21 @@ jobs:
 
       - name: 👍 Approve PR
         if: ${{ contains(fromJSON('["version-update:semver-patch", "version-update:semver-minor"]'), steps.dependabot-metadata.outputs.update-type) && steps.dependabot-metadata.outputs.ghsa-id == '' && steps.dependabot-metadata.outputs.cvss == 0 }}
-        run: gh pr review --approve "${{ env.PR_URL }}"
+        run: |
+          gh pr review --approve "${{ env.PR_URL }}"
         env:
           GITHUB_TOKEN: ${{ steps.get-token.outputs.token }}
 
       - name: 🤝 Auto-merge PR
         if: ${{ contains(fromJSON('["version-update:semver-patch", "version-update:semver-minor"]'), steps.dependabot-metadata.outputs.update-type) && steps.dependabot-metadata.outputs.ghsa-id == '' && steps.dependabot-metadata.outputs.cvss == 0 }}
-        run: gh pr merge --auto --delete-branch --squash "${{ env.PR_URL }}"
+        run: |
+          gh pr merge --auto --delete-branch --squash "${{ env.PR_URL }}"
         env:
           GITHUB_TOKEN: ${{ steps.get-token.outputs.token }}
 
       - name: 🚨 Label security
         if: ${{ steps.dependabot-metadata.outputs.ghsa-id != '' || steps.dependabot-metadata.outputs.cvss != 0 }}
-        run: gh pr edit "${{ env.PR_URL }}" --add-label "no-combine,security"
+        run: |
+          gh pr edit "${{ env.PR_URL }}" --add-label "no-combine,security"
         env:
           GITHUB_TOKEN: ${{ steps.get-token.outputs.token }}

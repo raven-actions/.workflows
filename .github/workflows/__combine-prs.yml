@@ -8,7 +8,7 @@ on:
         description: The type of runner to use
         required: false
         type: string
-        default: ubuntu-latest
+        default: ubuntu-24.04
       branch-prefix:
         description: The prefix of the branches to combine
         required: false
@@ -53,6 +53,8 @@ on:
         description: The pull request number if a PR was created
         value: ${{ jobs.combine-prs.outputs.pr-number }}
 
+permissions: {}
+
 concurrency:
   group: ${{ format('{0}-{1}-{2}-{3}-{4}', github.workflow, github.event_name, github.ref, github.base_ref, github.head_ref) }}
   cancel-in-progress: true
@@ -66,10 +68,11 @@ jobs:
     outputs:
       pr-url: ${{ steps.combine-prs.outputs.pr_url }}
       pr-number: ${{ steps.combine-prs.outputs.pr_number }}
-    # permissions:
-    #   contents: write  # to create a new branch and merge other branches together
-    #   pull-requests: write  # to create a new PR with the combined changes
-    #   checks: read  # to check if CI is passing or not before combining PRs
+    permissions:
+      contents: write # to create a new branch and merge other branches together
+      pull-requests: write # to create a new PR with the combined changes
+      checks: read # to check if CI is passing or not before combining PRs
+    timeout-minutes: 15
     runs-on: ${{ inputs.runs-on }}
     steps:
       - name: 🩺 Debug
@@ -86,6 +89,9 @@ jobs:
         with:
           app-id: ${{ secrets.ORG_BOT_APP_ID }}
           private-key: ${{ secrets.ORG_BOT_PRIVATE_KEY }}
+          permission-contents: write
+          permission-pull-requests: write
+          permission-checks: read
 
       - name: 🫂 Combine PRs
         id: combine-prs

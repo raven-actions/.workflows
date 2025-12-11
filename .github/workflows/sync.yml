@@ -17,6 +17,8 @@ on:
         required: false
         default: false
 
+permissions: {}
+
 # Allow one concurrent
 concurrency:
   group: ${{ format('{0}-{1}-{2}-{3}-{4}', github.workflow, github.event_name, github.ref, github.base_ref, github.head_ref) }}
@@ -28,7 +30,10 @@ env:
 jobs:
   sync:
     name: Sync
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    timeout-minutes: 15
     steps:
       - name: Debug
         uses: raven-actions/debug@9dbdeb7eea607a7d73411895c65987e71d59a466 # v1.2.0
@@ -39,6 +44,8 @@ jobs:
 
       - name: Checkout
         uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+        with:
+          persist-credentials: false
 
       - name: Get App Token
         uses: actions/create-github-app-token@29824e69f54612133e76f7eaac726eef6c875baf # v2.2.1
@@ -46,6 +53,8 @@ jobs:
         with:
           app-id: ${{ secrets.SYNC_BOT_APP_ID }}
           private-key: ${{ secrets.SYNC_BOT_PRIVATE_KEY }}
+          permission-contents: write
+          permission-pull-requests: write
           owner: ${{ github.repository_owner }}
           repositories: |
             .workflows

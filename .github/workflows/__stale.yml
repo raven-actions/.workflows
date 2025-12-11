@@ -8,7 +8,7 @@ on:
         description: The type of runner to use
         required: false
         type: string
-        default: ubuntu-latest
+        default: ubuntu-24.04
 
     outputs:
       closed-issues-prs:
@@ -17,6 +17,8 @@ on:
       staled-issues-prs:
         description: List of all staled issues and pull requests
         value: ${{ jobs.stale.outputs.staled-issues-prs }}
+
+permissions: {}
 
 concurrency:
   group: ${{ format('{0}-{1}-{2}-{3}-{4}', github.workflow, github.event_name, github.ref, github.base_ref, github.head_ref) }}
@@ -33,10 +35,10 @@ jobs:
     outputs:
       closed-issues-prs: ${{ steps.stale.outputs.id }}
       staled-issues-prs: ${{ steps.stale.outputs.name }}
-    # permissions:
-    #   contents: write # only for delete-branch option
-    #   issues: write
-    #   pull-requests: write
+    permissions:
+      issues: write
+      pull-requests: write
+    timeout-minutes: 15
     runs-on: ${{ inputs.runs-on }}
     steps:
       - name: 🩺 Debug
@@ -47,19 +49,12 @@ jobs:
           needs-context: ${{ toJson(needs) }}
           inputs-context: ${{ toJson(inputs) }}
 
-      - name: 🔑 Get GitHub Token
-        uses: actions/create-github-app-token@29824e69f54612133e76f7eaac726eef6c875baf # v2.2.1
-        id: get-token
-        with:
-          app-id: ${{ secrets.ORG_BOT_APP_ID }}
-          private-key: ${{ secrets.ORG_BOT_PRIVATE_KEY }}
-
       - name: ✖️ Stale
         uses: actions/stale@997185467fa4f803885201cee163a9f38240193d # v10.1.1
         id: stale
         with:
           # general
-          repo-token: ${{ steps.get-token.outputs.token }}
+          repo-token: ${{ github.token }}
           days-before-stale: ${{ env.DAYS_BEFORE_STALE }}
           days-before-close: ${{ env.DAYS_BEFORE_CLOSE }}
           # issues
