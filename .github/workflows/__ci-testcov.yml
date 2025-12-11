@@ -107,7 +107,7 @@ jobs:
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: test-results
-          path: "reports/jest-*.xml"
+          path: "reports/vitest-*.xml"
           if-no-files-found: warn
 
       - name: 📤 Upload coverage results
@@ -120,13 +120,14 @@ jobs:
 
       - name: 📜 Test report
         if: ${{ steps.changes.outputs.app == 'true' && matrix.os == 'ubuntu-latest' }}
-        uses: phoenix-actions/test-reporting@f957cd93fc2d848d556fa0d03c57bc79127b6b5e # v15
+        # uses: phoenix-actions/test-reporting@f957cd93fc2d848d556fa0d03c57bc79127b6b5e # v15
+        uses: dorny/test-reporter@fe45e9537387dac839af0d33ba56eed8e24189e8 # v2.3.0
         with:
           token: ${{ steps.get-token.outputs.token }}
           name: 📜 Test report
-          path: "reports/jest-*.xml"
+          path: "reports/vitest-*.xml"
           reporter: jest-junit
-          output-to: step-summary
+          use-actions-summary: true
 
       - name: 📜 Coverage report
         if: ${{ steps.changes.outputs.app == 'true' && matrix.os == 'ubuntu-latest' }}
