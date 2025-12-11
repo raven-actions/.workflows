@@ -53,17 +53,11 @@ jobs:
         with:
           app-id: ${{ secrets.SYNC_BOT_APP_ID }}
           private-key: ${{ secrets.SYNC_BOT_PRIVATE_KEY }}
+          permission-metadata: read
           permission-contents: write
           permission-pull-requests: write
+          permission-workflows: write
           owner: ${{ github.repository_owner }}
-          repositories: |
-            .workflows
-            actionlint
-            bot-details
-            debug
-            environment-variables
-            get-repos
-            publish-and-tag
 
       - name: Get bot details
         id: bot-details
@@ -77,7 +71,7 @@ jobs:
         uses: BetaHuhn/repo-file-sync-action@2da9fa866f117b06abec3e4c61c5e96ef86c142f
         with:
           GH_INSTALLATION_TOKEN: ${{ steps.get-token.outputs.token }}
-          CONFIG_PATH: sync.yml
+          CONFIG_PATH: .github/sync.yml
           COMMIT_PREFIX: "chore:"
           GIT_EMAIL: ${{ steps.bot-details.outputs.email }}
           GIT_USERNAME: ${{ steps.bot-details.outputs.name }}
