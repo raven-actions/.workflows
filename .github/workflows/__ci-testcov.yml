@@ -107,7 +107,7 @@ jobs:
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: test-results
-          path: "reports/junit*.xml"
+          path: reports/junit.xml
           if-no-files-found: warn
 
       - name: 📤 Upload coverage results
@@ -125,13 +125,22 @@ jobs:
         with:
           token: ${{ steps.get-token.outputs.token }}
           name: 📜 Test report
-          path: "reports/junit*.xml"
+          path: reports/junit.xml
           reporter: jest-junit
           use-actions-summary: true
 
-      - name: 📜 Coverage report
+      - name: 📜 Test Coverage Report
         if: ${{ steps.changes.outputs.app == 'true' && matrix.os == 'ubuntu-latest' }}
-        uses: codecov/codecov-action@5a1091511ad55cbe89839c7260b706298ca349f7 # v5.5.1
+        uses: codecov/codecov-action@671740ac38dd9b0130fbe1cec585b89eea48d3de # v5.5.2
         with:
           use_oidc: true
           files: coverage/cobertura-coverage.xml
+          report_type: coverage
+
+      - name: 📜 Test Result Report
+        if: ${{ steps.changes.outputs.app == 'true' && matrix.os == 'ubuntu-latest' }}
+        uses: codecov/codecov-action@671740ac38dd9b0130fbe1cec585b89eea48d3de # v5.5.2
+        with:
+          use_oidc: true
+          files: reports/junit.xml
+          report_type: test_results
