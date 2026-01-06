@@ -104,7 +104,7 @@ jobs:
 
       - name: 📤 Upload test results
         if: ${{ steps.changes.outputs.app == 'true' && matrix.os == 'ubuntu-24.04' }}
-        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
         with:
           name: test-results
           path: reports/junit.xml
@@ -112,7 +112,7 @@ jobs:
 
       - name: 📤 Upload coverage results
         if: ${{ steps.changes.outputs.app == 'true' && matrix.os == 'ubuntu-24.04' }}
-        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
         with:
           name: coverage-results
           path: coverage
@@ -121,7 +121,7 @@ jobs:
       - name: 📜 Test report
         if: ${{ steps.changes.outputs.app == 'true' && matrix.os == 'ubuntu-24.04' }}
         # uses: phoenix-actions/test-reporting@f957cd93fc2d848d556fa0d03c57bc79127b6b5e # v15
-        uses: dorny/test-reporter@fe45e9537387dac839af0d33ba56eed8e24189e8 # v2.3.0
+        uses: dorny/test-reporter@b082adf0eced0765477756c2a610396589b8c637 # v2.5.0
         with:
           token: ${{ github.token }}
           name: 📜 Test report
